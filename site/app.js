@@ -30,7 +30,7 @@
     $("#form-error").textContent = "";
     const f = form.elements;
     if (!f.birth.value) {
-      $("#form-error").textContent = "생년월일을 넣어 주거라.";
+      $("#form-error").textContent = "생년월일을 입력해 주세요.";
       return;
     }
     const [year, month, day] = f.birth.value.split("-").map(Number);
@@ -57,9 +57,9 @@
 
   function render(r, name) {
     const reading = R.build(r, S);
-    const who = name ? esc(name) + josa(name, "이", "") : "아가";
+    const who = name ? `${esc(name)}님` : "당신";
     const dmWord = S.STEMS[r.dayMaster] + S.ELEMENTS[r.dayMasterElement];
-    $("#greet").innerHTML = `아이고, ${who} 왔구먼. ${r.input.year}년생 <b>${r.animal}띠</b>(${S.label(r.pillars.year)}년)이고, 태어난 날 기운은 <b>${dmWord}</b>${josa(dmWord, "이여", "여")}. 찬찬히 봐 줄게.`;
+    $("#greet").innerHTML = `${who}의 사주를 펼쳐 봤어요. ${r.input.year}년생 <b>${r.animal}띠</b>(${S.label(r.pillars.year)}년)이고, 나를 나타내는 일간은 <b>${dmWord}</b>${josa(dmWord, "이에요", "예요")}.`;
 
     const cols = [
       ["시", r.pillars.hour, r.hourName || "시 모름"],
@@ -91,7 +91,7 @@
           <b>${c}</b>
         </div>`)
       .join("");
-    $("#balance").textContent = `제일 센 기운은 ${reading.strongText}이구먼. ${reading.balance}`;
+    $("#balance").textContent = `가장 강한 기운은 ${reading.strongText}이에요. ${reading.balance}`;
 
     $("#dm-title").textContent = reading.dayMaster.title;
     $("#dm-nature").textContent = reading.dayMaster.nature;
@@ -99,7 +99,7 @@
     $("#dm-care").textContent = reading.dayMaster.care;
 
     $("#tips").innerHTML = reading.tips
-      .map((t) => `<div class="tip"><h4>${esc(t.name)}</h4>행운의 색: ${esc(t.color)}<br>좋은 방향: ${esc(t.direction)}<br>이렇게 채우거라: ${esc(t.tip)}</div>`)
+      .map((t) => `<div class="tip"><h4>${esc(t.name)}</h4>행운의 색: ${esc(t.color)}<br>좋은 방향: ${esc(t.direction)}<br>채우는 방법: ${esc(t.tip)}</div>`)
       .join("");
 
     $("#year-title").textContent = `${reading.year.label} 기운`;
@@ -118,7 +118,7 @@
         <div class="price">${won(p.price)} <small>/ 1회</small></div>
         <p>${esc(p.desc)}</p>
         <ul>${p.includes.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
-        <button class="btn btn-red" data-order="${esc(p.id)}">이 풀이 주문하기</button>
+        <button class="btn btn-main" data-order="${esc(p.id)}">이 풀이 주문하기</button>
       </article>`)
     .join("");
 
