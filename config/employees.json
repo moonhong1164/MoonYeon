@@ -188,6 +188,18 @@
       "customer_facing": false
     },
     {
+      "id": "reader",
+      "name": "사주 풀이 작가",
+      "department": "sales",
+      "role": "주문서와 사주 자료(tools/chart.js)를 받아 평생 사주·궁합·재물운·신년운세 유료 풀이를 월연 말투로 쓴다.",
+      "skill": "saju-reading",
+      "effort": "high",
+      "web": false,
+      "routines": [],
+      "room": "orders",
+      "customer_facing": true
+    },
+    {
       "id": "cs-agent",
       "name": "고객 상담 담당",
       "department": "sales",
