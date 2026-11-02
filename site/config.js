@@ -11,7 +11,7 @@ window.SHOP = {
   kakaoUrl: "https://pf.kakao.com/_xjRyWX/chat",
 
   // 입금 계좌 — 비워 두면 '카톡으로 안내'라고 표시돼요.
-  bank: { name: "카카오뱅크", account: "3333313535589", holder: "" },
+  bank: { name: "", account: "", holder: "" },
 
   // 상담 응답 시간 안내
   hours: "평일 오전 10시 ~ 밤 10시 (주문 후 24~48시간 안에 풀이를 보내 드려요)",
