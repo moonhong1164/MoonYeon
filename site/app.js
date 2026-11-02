@@ -1,74 +1,191 @@
-// site/data/stats.json(실제 설정 + 업무일지)을 읽어 화면을 채운다.
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const fmt = (n) => Number(n || 0).toLocaleString("ko-KR");
+/* 화면 동작: 무료 사주 계산·풀이 표시, 상품 목록, 주문서 */
+(function () {
+  "use strict";
+  const S = window.Saju;
+  const R = window.Reading;
+  const SHOP = window.SHOP;
+  const $ = (sel) => document.querySelector(sel);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  // 받침 있으면 a, 없으면 b (예: 이여/여)
+  const josa = (word, a, b) => {
+    const c = word.charCodeAt(word.length - 1) - 0xac00;
+    return c >= 0 && c < 11172 && c % 28 ? a : b;
+  };
+  const won = (n) => n.toLocaleString("ko-KR") + "원";
 
-const HOUSE_RULES = [
-  "고객·외부로 나가는 메시지·메일·게시물은 초안까지만. 발송은 사장 승인 후.",
-  "돈·결제·환불·계약은 근거 숫자와 함께 보고하고, 결정은 사장이.",
-  "모르는 건 추측하지 않고 '확인 필요'. 법·세무 내용은 법령 원문 출처를 붙여요.",
-];
+  // 가게 이름
+  document.querySelectorAll("[data-shop=name]").forEach((el) => (el.textContent = SHOP.name));
+  document.title = SHOP.name;
+  if (SHOP.hours) $("#hours-text").textContent = SHOP.hours;
 
-function kpiCards(k) {
-  const cards = [
-    ["AI 직원", k.employees, "명", "blue", `그중 <b>${fmt(k.employees_on_routine)}명</b>은 정해진 시간에 알아서 출근`],
-    ["매일 출근 루틴", k.routines, "개", "blue", "사장이 자는 동안에도 정해진 시간에 실행"],
-    ["업무 지침서 (스킬)", k.skills, "개", "blue", "일하는 방식을 저장해 매번 같은 품질로 재사용"],
-    ["휴대폰으로 일 시키는 방", k.rooms, "개", "blue", "텔레그램: 본부·유튜브·블로그·주문·상담·메일"],
-    ["AI가 스스로 쓴 업무일지", k.worklog_total, "건", "red", `이번 달 <b>${fmt(k.worklog_month)}건</b> · 한 일과 배운 것을 기록`],
-    ["사장 승인 대기", k.pending_approvals, "건", "red", "고객에게 나가는 건 전부 사장이 승인해야 나가요"],
-  ];
-  return cards.map(([title, n, unit, color, desc]) => `
-    <article class="kpi">
-      <h3>${title}</h3>
-      <div class="num ${color}">${fmt(n)}<small>${unit}</small></div>
-      <p>${desc}</p>
-    </article>`).join("");
-}
+  // ── 무료 사주 ────────────────────────────────────────
+  const form = $("#saju-form");
+  const timeInput = form.elements.time;
+  form.elements.unknown.addEventListener("change", (e) => (timeInput.disabled = e.target.checked));
 
-function departments(depts) {
-  return depts.map((d) => `
-    <article class="dept">
-      <h3><span class="dot" style="background:${esc(d.color)}"></span>${esc(d.no)} ${esc(d.name)}</h3>
-      <ul>${d.employees.map((e) => `
-        <li><b>${esc(e.name)}</b> — ${esc(e.role)}
-          <span class="chips">
-            ${e.routines.length ? `<span class="chip">⏰ 루틴 ${e.routines.length}개</span>` : `<span class="chip">지시할 때</span>`}
-            ${e.web ? `<span class="chip">🔎 웹 조사</span>` : ""}
-            ${e.customer_facing ? `<span class="chip warn">✋ 사장 승인 후 발송</span>` : ""}
-            ${e.done ? `<span class="chip">완료 ${fmt(e.done)}건</span>` : ""}
-          </span>
-        </li>`).join("")}
-      </ul>
-    </article>`).join("");
-}
+  let last = null; // 주문서 미리 채우기용
 
-function recent(rows) {
-  if (!rows.length) {
-    return `<div class="log-empty">아직 기록이 없어요. 직원이 첫 일을 마치면 여기에 자동으로 쌓여요.</div>`;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    $("#form-error").textContent = "";
+    const f = form.elements;
+    if (!f.birth.value) {
+      $("#form-error").textContent = "생년월일을 넣어 주거라.";
+      return;
+    }
+    const [year, month, day] = f.birth.value.split("-").map(Number);
+    const unknown = f.unknown.checked;
+    const [hour, minute] = (f.time.value || "12:00").split(":").map(Number);
+    let r;
+    try {
+      r = S.calculate({ year, month, day, hour, minute, timeUnknown: unknown, solarTime: f.solar.checked });
+    } catch (err) {
+      $("#form-error").textContent = err.message;
+      return;
+    }
+    last = { name: f.name.value.trim(), gender: f.gender.value, birth: f.birth.value, time: unknown ? "모름" : f.time.value };
+    render(r, last.name);
+  });
+
+  function glyph(p, which) {
+    if (!p) return `<div class="glyph unknown"><span class="h">？</span><span class="k">모름</span></div>`;
+    const e = which === "stem" ? S.STEM_ELEMENT[p.stem] : S.BRANCH_ELEMENT[p.branch];
+    const h = which === "stem" ? S.STEMS_HANJA[p.stem] : S.BRANCHES_HANJA[p.branch];
+    const k = which === "stem" ? S.STEMS[p.stem] : S.BRANCHES[p.branch];
+    return `<div class="glyph e${e}"><span class="h">${h}</span><span class="k">${k} · ${S.ELEMENTS[e]}</span></div>`;
   }
-  return rows.map((r) => `
-    <div class="log-row">
-      <span class="when">${esc(r.at.slice(5, 16).replace("T", " "))}</span>
-      <span class="who">${esc(r.employee)}</span>
-      <span>${r.status === "failed" ? "⚠️ " : ""}${esc(r.summary || r.task)}</span>
-    </div>`).join("");
-}
 
-async function main() {
-  let s;
-  try {
-    const res = await fetch("data/stats.json", { cache: "no-store" });
-    s = await res.json();
-  } catch (e) {
-    document.getElementById("generated").textContent = "숫자를 불러오지 못했어요. `python -m moonyeon stats` 후 웹 서버로 열어 주세요.";
-    return;
+  function render(r, name) {
+    const reading = R.build(r, S);
+    const who = name ? esc(name) + josa(name, "이", "") : "아가";
+    const dmWord = S.STEMS[r.dayMaster] + S.ELEMENTS[r.dayMasterElement];
+    $("#greet").innerHTML = `아이고, ${who} 왔구먼. ${r.input.year}년생 <b>${r.animal}띠</b>(${S.label(r.pillars.year)}년)이고, 태어난 날 기운은 <b>${dmWord}</b>${josa(dmWord, "이여", "여")}. 찬찬히 봐 줄게.`;
+
+    const cols = [
+      ["시", r.pillars.hour, r.hourName || "시 모름"],
+      ["일", r.pillars.day, "나 자신"],
+      ["월", r.pillars.month, `${r.monthTermName} 이후`],
+      ["년", r.pillars.year, `${r.animal}띠`],
+    ];
+    $("#pillars").innerHTML = cols
+      .map(([head, p, note]) => `
+        <div class="pillar ${head === "일" ? "me" : ""}">
+          <div class="head">${head}주 <small>${esc(note)}</small></div>
+          ${glyph(p, "stem")}${glyph(p, "branch")}
+        </div>`)
+      .join("");
+    const notes = [];
+    notes.push(r.input.useSolarTime ? "서울 기준 보정" : "보정 없음");
+    if (r.input.dst) notes.push("서머타임 1시간 뺌");
+    $("#calendar-note").textContent = `(양력 ${r.input.year}.${r.input.month}.${r.input.day}${r.input.timeUnknown ? "" : ` ${String(r.input.hour).padStart(2, "0")}:${String(r.input.minute).padStart(2, "0")}`} · ${notes.join(" · ")})`;
+    $("#boundary-note").textContent = r.nearTermBoundary
+      ? "⚠️ 절기가 바뀌는 시각과 가까운 때에 태어났어요. 몇십 분 차이로 월주가 달라질 수 있으니, 자세한 풀이에서 정확히 짚어 드려요."
+      : "가운데 굵은 테두리가 '나 자신'을 뜻하는 일간이에요.";
+
+    const total = r.counts.reduce((a, b) => a + b, 0);
+    $("#bars").innerHTML = r.counts
+      .map((c, i) => `
+        <div class="bar">
+          <span>${S.ELEMENTS[i]}(${S.ELEMENTS_HANJA[i]})</span>
+          <div class="track"><div class="fill e${i}" style="width:${(c / total) * 100}%"></div></div>
+          <b>${c}</b>
+        </div>`)
+      .join("");
+    $("#balance").textContent = `제일 센 기운은 ${reading.strongText}이구먼. ${reading.balance}`;
+
+    $("#dm-title").textContent = reading.dayMaster.title;
+    $("#dm-nature").textContent = reading.dayMaster.nature;
+    $("#dm-good").textContent = reading.dayMaster.good;
+    $("#dm-care").textContent = reading.dayMaster.care;
+
+    $("#tips").innerHTML = reading.tips
+      .map((t) => `<div class="tip"><h4>${esc(t.name)}</h4>행운의 색: ${esc(t.color)}<br>좋은 방향: ${esc(t.direction)}<br>이렇게 채우거라: ${esc(t.tip)}</div>`)
+      .join("");
+
+    $("#year-title").textContent = `${reading.year.label} 기운`;
+    $("#year-text").textContent = reading.year.text;
+
+    $("#result").hidden = false;
+    $("#result").scrollIntoView({ behavior: "smooth", block: "start" });
   }
-  document.querySelectorAll("[data-bind=name]").forEach((el) => (el.textContent = s.business.name));
-  document.getElementById("kpis").innerHTML = kpiCards(s.kpi);
-  document.getElementById("generated").textContent = `기준 시각 ${s.generated_at.replace("T", " ").slice(0, 16)} · 설정 파일과 업무일지에서 자동 집계`;
-  document.getElementById("departments").innerHTML = departments(s.departments);
-  document.getElementById("recent").innerHTML = recent(s.recent);
-  document.getElementById("rules").innerHTML = HOUSE_RULES.map((r) => `<li>${esc(r)}</li>`).join("");
-}
 
-main();
+  // ── 상품 목록 ────────────────────────────────────────
+  $("#product-list").innerHTML = SHOP.products
+    .map((p) => `
+      <article class="product">
+        ${p.badge ? `<span class="badge">${esc(p.badge)}</span>` : ""}
+        <h3>${esc(p.name)}</h3>
+        <div class="price">${won(p.price)} <small>/ 1회</small></div>
+        <p>${esc(p.desc)}</p>
+        <ul>${p.includes.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+        <button class="btn btn-red" data-order="${esc(p.id)}">이 풀이 주문하기</button>
+      </article>`)
+    .join("");
+
+  // ── 주문서 ──────────────────────────────────────────
+  const dialog = $("#order");
+  const of = $("#order-form");
+  const productSelect = $("#order-product");
+  productSelect.innerHTML = SHOP.products.map((p) => `<option value="${esc(p.id)}">${esc(p.name)} (${won(p.price)})</option>`).join("");
+
+  const bank = SHOP.bank || {};
+  $("#bank").innerHTML = bank.account
+    ? `입금 계좌: <b>${esc(bank.name)} ${esc(bank.account)}</b> (예금주 ${esc(bank.holder)})<br><span class="small">입금자명은 주문서 이름과 같게 해 주세요.</span>`
+    : "입금 계좌는 카카오톡으로 주문서를 보내 주시면 안내해 드려요.";
+  if (SHOP.kakaoUrl) {
+    $("#kakao-link").href = SHOP.kakaoUrl;
+    $("#kakao-link").hidden = false;
+  }
+
+  function orderText() {
+    const f = of.elements;
+    const p = SHOP.products.find((x) => x.id === f.product.value);
+    const lines = [
+      `[${SHOP.name} 주문서]`,
+      `상품: ${p.name} (${won(p.price)})`,
+      `이름: ${f.name.value}`,
+      `성별: ${f.gender.value}`,
+      `생년월일: ${f.birth.value}`,
+      `태어난 시각: ${f.time.value || "모름"}`,
+    ];
+    if (p.id === "love") lines.push(`상대방: ${f.partner.value}`);
+    lines.push(`궁금한 점: ${f.question.value || "-"}`, `연락처: ${f.contact.value}`);
+    return lines.join("\n");
+  }
+
+  function refresh() {
+    $("#partner-wrap").hidden = of.elements.product.value !== "love";
+    $("#order-text").textContent = orderText();
+    $("#copy-done").textContent = "";
+  }
+  of.addEventListener("input", refresh);
+  of.addEventListener("change", refresh);
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-order]");
+    if (!btn) return;
+    of.elements.product.value = btn.dataset.order;
+    if (last) {
+      of.elements.name.value ||= last.name;
+      of.elements.gender.value = last.gender;
+      of.elements.birth.value ||= `${last.birth} (양력)`;
+      of.elements.time.value ||= last.time;
+    }
+    refresh();
+    dialog.showModal();
+  });
+
+  $("#copy-order").addEventListener("click", async () => {
+    const f = of.elements;
+    if (!f.name.value || !f.birth.value || !f.contact.value) {
+      $("#copy-done").textContent = "이름, 생년월일, 연락받을 곳은 꼭 적어 주세요.";
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(orderText());
+      $("#copy-done").textContent = "복사했어요! 카카오톡 채팅창에 붙여 넣어 보내 주세요.";
+    } catch {
+      $("#copy-done").textContent = "자동 복사가 안 돼요. 위 주문서를 길게 눌러 직접 복사해 주세요.";
+    }
+  });
+})();
