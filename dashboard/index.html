@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MoonYeon AI 직원 팀</title>
+  <meta name="description" content="직원 0명, 사장 1명 + AI 직원 팀으로 돌아가는 1인 사업 운영 시스템">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="logo" href="#top"><span class="moon">☾</span> <span data-bind="name">MoonYeon</span></a>
+      <nav>
+        <a href="#numbers">성과</a>
+        <a href="#report">실제 보고</a>
+        <a href="#tasks">맡긴 일</a>
+        <a href="#how">작동 방식</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- 히어로 -->
+    <section class="hero wrap">
+      <p class="pill">사장 1명 + AI 직원 팀</p>
+      <h1 class="display">직원 <em class="red">0명</em>인데<br>일은 <em class="blue">팀이</em> 다 해요</h1>
+      <p class="lead">
+        콘텐츠·판매·고객 응대·서류·돈 관리까지 AI 직원들이 나눠 맡아요.<br>
+        사장이 하는 건 휴대폰으로 <b>"이거 해줘" 한 줄</b> + 고객에게 보내는 <b>승인 버튼</b>뿐.
+      </p>
+    </section>
+
+    <!-- 숫자 -->
+    <section id="numbers" class="wrap">
+      <div class="kpi-grid" id="kpis"></div>
+      <p class="note" id="generated"></p>
+    </section>
+
+    <!-- 실제 보고 예시 -->
+    <section id="report" class="band band-cream">
+      <div class="wrap">
+        <h2 class="display">돈이 오가는 일까지<br><span class="mark">AI 직원에게</span> 맡깁니다</h2>
+        <p class="lead">글 쓰고 영상 만드는 것보다 더 귀찮은 건 매출 뒤에 붙는 잡무예요.<br>아래는 밤에 한 줄 지시하고 자고 일어나면 받는 주문 정리 보고 예시예요.</p>
+
+        <div class="chat">
+          <div class="chat-head">
+            <span class="room">📦 주문·광고 방</span>
+            <span class="badge">예시 화면 · 고객 정보 없음</span>
+          </div>
+          <div class="chat-body">
+            <div class="tag tag-left">① 밤 12시 45분, <b>사장 지시 한 줄</b></div>
+            <div class="msg me">오늘 주문 시트 정리하고 주문 등록까지 해줘. 추가 질문 답변은 분석 끝난 다음에 써 두고, 다 하면 결과 알려줘<time>12:45 AM</time></div>
+            <div class="msg bot">시작했어요: 주문 정리 → 장부 기록 → 추가답변 초안 (약 30~40분)<time>12:46 AM</time></div>
+            <div class="tag tag-right">② 끝나면 <b>결과 보고</b></div>
+            <div class="msg bot">
+              <p><b>오늘 주문 정리를 끝냈어요. 고객에게는 아무것도 보내지 않았어요.</b></p>
+              <ul>
+                <li><b>입금</b> 7건 (8명, 합계 금액) — 입금자명·금액 대조 완료</li>
+                <li><b>장부</b> 새 행만 추가했어요. 기존 칸은 바뀐 게 없어요.</li>
+                <li><b>확인 필요</b> 1건 — 입금자명이 주문자와 달라요</li>
+                <li><b>추가답변</b> 7건 초안 작성 → 원문과 대조해 7/7 일치. 고친 곳: 오타 1, 어색한 문장 1</li>
+              </ul>
+              <p class="approve">📝 승인 대기 7건 — <code>/approve 번호</code> 누르면 나가요</p>
+              <time>3:08 AM</time>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 맡긴 일 전체 -->
+    <section id="tasks" class="wrap">
+      <p class="pill">하나도 안 빼고 적었어요</p>
+      <h2 class="display">AI 직원에게<br>맡긴 일 <span class="blue">전체 목록</span></h2>
+      <p class="lead muted">사장이 직접 하는 건 "해줘" 한 줄 + 고객에게 보내는 버튼 누르기</p>
+      <div id="departments"></div>
+    </section>
+
+    <!-- 작동 방식 -->
+    <section id="how" class="band band-ink">
+      <div class="wrap">
+        <h2 class="display light">이걸 매일 돌리는 장치</h2>
+        <ol class="steps">
+          <li><span>1</span><h3>한 줄 지시</h3><p>텔레그램 방에 "이거 해줘". 방은 유튜브·블로그·주문·상담·메일로 나눠 써요.</p></li>
+          <li><span>2</span><h3>비서실장이 분배</h3><p>순서가 있는 일은 순서대로. "분석 끝나야 답변" 같은 것도 알아서 지켜요.</p></li>
+          <li><span>3</span><h3>직원이 지침서대로</h3><p>일하는 방식은 '스킬'(업무 지침서)로 저장해 매번 같은 품질로 재사용해요.</p></li>
+          <li><span>4</span><h3>검수관이 한 번 더</h3><p>사실·숫자·계산·맞춤법을 검사하고 통과한 것만 올려요.</p></li>
+          <li><span>5</span><h3>사장은 승인만</h3><p>고객·외부로 나가는 건 전부 초안. 사장이 승인해야 나가요.</p></li>
+        </ol>
+        <ul class="rules" id="rules"></ul>
+      </div>
+    </section>
+
+    <!-- 최근 업무일지 -->
+    <section id="log" class="wrap">
+      <h2 class="display small">AI 직원이 스스로 쓴 <span class="red">업무일지</span></h2>
+      <div id="recent" class="log"></div>
+    </section>
+
+    <section class="wrap">
+      <div class="cta">
+        <p>콘텐츠 · 판매 · 고객 응대 · 서류 · 돈 관리까지</p>
+        <p class="big">전부 <span class="yellow">"사장 1명 + AI 직원 팀"</span>으로 돌아가요</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <span data-bind="name">MoonYeon</span> · 숫자는 실제 설정과 업무일지(<code>python -m moonyeon stats</code>)에서 자동으로 채워져요.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

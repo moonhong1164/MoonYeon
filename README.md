@@ -1,4 +1,4 @@
-# MoonYeon — 사장 1명 + AI 직원 팀
+# MoonYeon — 문연 할매 사주 + AI 직원 팀
 
 직원 0명인 1인 사업을 **AI 직원 17명**이 나눠 맡는 운영 시스템과, 그 성과를 보여 주는 **홈페이지**입니다.
 사장은 휴대폰(텔레그램)으로 "이거 해줘" 한 줄 보내고, 고객에게 나가는 초안에 **승인**만 누릅니다.
@@ -70,26 +70,31 @@ python -m moonyeon bot
 
 텔레그램 명령: 한 줄 지시 · `/team` · `/run <직원id> <지시>` · `/outbox` · `/approve <번호>` · `/reject <번호>` · `/log`
 
-## 홈페이지
+## 사주 홈페이지 (`site/`)
 
-```bash
-python -m moonyeon stats
-```
+**문연 할매 사주** — 할머니 캐릭터가 구수한 말투로 풀어 주는 사주 사이트입니다.
 
-```bash
-cd site && python3 -m http.server 8000
-```
+- **무료 사주**: 양력 생년월일·시각을 넣으면 사주 원국표(만세력), 오행 분포, 타고난 성품(일간), 모자란 기운 채우는 법, 올해 기운을 보여 줍니다.
+  - 계산은 전부 브라우저 안에서 하며(`site/saju.js`, 외부 라이브러리 없음) 입력 정보를 저장하지 않습니다.
+  - 입춘·절기 기준 연주/월주, 23시 자시, 서울 경도 시간 보정(-32분, 끌 수 있음), 1987·1988 서머타임 반영.
+  - 음력 입력은 아직 없습니다. 한국천문연구원 음양력 변환 링크로 안내합니다.
+- **유료 풀이**: 평생 사주·연애 궁합·재물/직업운·신년운세. 주문서를 작성하면 카카오톡으로 보내고 계좌이체로 결제받습니다.
+- **✏️ 사장님이 고칠 곳은 `site/config.js` 하나**: 가게 이름, 카카오톡 채널 주소, 입금 계좌, 상품·가격(현재 가격은 예시).
 
-**GitHub Pages 공개**: `.github/workflows/pages.yml`이 `main`에 `site/` 변경이 올라올 때마다 자동 배포합니다.
-처음 한 번만 저장소 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 바꿔 주세요.
-주소는 `https://moonhong1164.github.io/MoonYeon/` 입니다.
+**공개**: `.github/workflows/pages.yml`이 `main`에 `site/` 변경이 올라올 때마다 GitHub Pages로 배포합니다 → https://moonhong1164.github.io/MoonYeon/
 
-숫자 갱신: 서버에서 `python -m moonyeon stats` 실행 → 바뀐 `site/data/stats.json`을 커밋·푸시하면 홈페이지에 반영됩니다.
+## AI 직원 대시보드 (`dashboard/`)
+
+AI 직원 팀 현황 페이지(내부용)는 `dashboard/`에 있습니다. `python -m moonyeon stats`로 숫자를 갱신하고 `cd dashboard && python3 -m http.server 8000`으로 봅니다.
 
 ## 테스트
 
 ```bash
 python -m pytest -q
+```
+
+```bash
+node --test tests/saju.test.js
 ```
 
 AI 호출은 Claude API(`claude-opus-5-5`, 적응형 사고, 직원별 effort, 웹 검색, 거절 시 서버 측 대체 모델)를 사용합니다.

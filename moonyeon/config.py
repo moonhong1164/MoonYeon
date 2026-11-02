@@ -15,7 +15,7 @@ INBOX_DIR = DATA_DIR / "inbox"
 OUTPUT_DIR = DATA_DIR / "outputs"
 OUTBOX_DIR = DATA_DIR / "outbox"
 WORKLOG_PATH = DATA_DIR / "worklog.jsonl"
-SITE_DATA_DIR = ROOT / "site" / "data"
+SITE_DATA_DIR = ROOT / "dashboard" / "data"
 
 
 @dataclass
