@@ -1,0 +1,14 @@
+# 리눅스 서버에서 24시간 켜 두기: sudo cp deploy/moonyeon.service /etc/systemd/system/ && sudo systemctl enable --now moonyeon
+[Unit]
+Description=MoonYeon AI 직원 팀 (텔레그램 방 + 루틴)
+After=network-online.target
+
+[Service]
+WorkingDirectory=/opt/moonyeon
+EnvironmentFile=/opt/moonyeon/.env
+ExecStart=/usr/bin/python3 -m moonyeon bot
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,264 @@
+{
+  "generated_at": "2026-11-02T22:47+09:00",
+  "business": {
+    "name": "MoonYeon",
+    "tagline": "직원 0명, 사장 1명 + AI 직원 팀",
+    "description": "1인 사업의 콘텐츠·판매·고객응대·서류·돈 관리를 AI 직원 팀이 나눠 맡고, 사장은 휴대폰으로 한 줄 지시하고 최종 승인 버튼만 누릅니다."
+  },
+  "kpi": {
+    "employees": 17,
+    "employees_on_routine": 12,
+    "routines": 12,
+    "skills": 17,
+    "rooms": 6,
+    "worklog_total": 0,
+    "worklog_month": 0,
+    "pending_approvals": 0
+  },
+  "departments": [
+    {
+      "id": "content",
+      "no": "①",
+      "name": "콘텐츠 · 채널 운영",
+      "color": "#6c5ce7",
+      "employees": [
+        {
+          "id": "yt-writer",
+          "name": "유튜브 기획·대본 작가",
+          "role": "유튜브 영상 기획안·대본·제목/썸네일 문구 A/B안을 만든다.",
+          "web": true,
+          "customer_facing": true,
+          "done": 0,
+          "routines": [
+            "0 9 * * 1-5"
+          ]
+        },
+        {
+          "id": "yt-comments",
+          "name": "댓글 담당",
+          "role": "inbox에 모인 유튜브 댓글에 답글 초안을 달고, 아침 성과 보고를 쓴다.",
+          "web": false,
+          "customer_facing": true,
+          "done": 0,
+          "routines": [
+            "0 8,12,16,20 * * *"
+          ]
+        },
+        {
+          "id": "competitor-watch",
+          "name": "경쟁 채널 감시",
+          "role": "경쟁 채널·블로그·광고를 살피고 주 3회 심층 분석을 낸다.",
+          "web": true,
+          "customer_facing": false,
+          "done": 0,
+          "routines": [
+            "0 10 * * 1,3,5"
+          ]
+        },
+        {
+          "id": "blog-writer",
+          "name": "네이버 블로그 작가",
+          "role": "네이버 블로그 원고를 매일 쓰고, 썸네일·카드뉴스 문구까지 만든다.",
+          "web": true,
+          "customer_facing": false,
+          "done": 0,
+          "routines": [
+            "0 7 * * *"
+          ]
+        },
+        {
+          "id": "blog-reviewer",
+          "name": "블로그 검수관",
+          "role": "블로그 원고의 사실·숫자·계산·맞춤법을 검사하고 통과한 글만 올린다.",
+          "web": true,
+          "customer_facing": true,
+          "done": 0,
+          "routines": []
+        },
+        {
+          "id": "sns-manager",
+          "name": "SNS 담당",
+          "role": "블로그·유튜브 원고를 스레드·인스타·X·틱톡·페이스북·클립용으로 다시 쓴다.",
+          "web": false,
+          "customer_facing": true,
+          "done": 0,
+          "routines": [
+            "0 13 * * *"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sales",
+      "no": "②",
+      "name": "판매 · 고객 응대",
+      "color": "#f0932b",
+      "employees": [
+        {
+          "id": "order-clerk",
+          "name": "주문 정리 담당",
+          "role": "입금된 주문을 찾아 장부에 기록하고, 주문 등록·분석 진행 상황을 보고한다.",
+          "web": false,
+          "customer_facing": false,
+          "done": 0,
+          "routines": [
+            "45 0 * * *"
+          ]
+        },
+        {
+          "id": "cs-agent",
+          "name": "고객 상담 담당",
+          "role": "고객 문의·추가 질문에 답변 초안을 쓰고, 확인이 필요한 건만 사장에게 올린다.",
+          "web": false,
+          "customer_facing": true,
+          "done": 0,
+          "routines": [
+            "0 2,6 * * *"
+          ]
+        },
+        {
+          "id": "ad-analyst",
+          "name": "광고 분석가",
+          "role": "광고 성과를 분석해 예산·타깃 조정안을 내고, 경쟁 업체 광고를 조사한다.",
+          "web": true,
+          "customer_facing": false,
+          "done": 0,
+          "routines": [
+            "0 9 * * 1"
+          ]
+        },
+        {
+          "id": "product-designer",
+          "name": "상세페이지 기획자",
+          "role": "신상품 상세페이지 구성안과 문구, 이미지/움짤 지시서를 만든다.",
+          "web": false,
+          "customer_facing": true,
+          "done": 0,
+          "routines": []
+        }
+      ]
+    },
+    {
+      "id": "research",
+      "no": "③",
+      "name": "자료 조사 · 강의 준비",
+      "color": "#00b894",
+      "employees": [
+        {
+          "id": "researcher",
+          "name": "자료 조사원",
+          "role": "주제를 조사하고 팩트체크·출처까지 붙인 자료집을 만든다.",
+          "web": true,
+          "customer_facing": false,
+          "done": 0,
+          "routines": []
+        },
+        {
+          "id": "lecture-maker",
+          "name": "강의 자료 제작자",
+          "role": "강의 목차·슬라이드 원고·실습지를 만든다. 법·세무 내용은 법령 원문으로 팩트체크한다.",
+          "web": true,
+          "customer_facing": false,
+          "done": 0,
+          "routines": []
+        }
+      ]
+    },
+    {
+      "id": "admin",
+      "no": "④",
+      "name": "사업 서류 · 돈 관리",
+      "color": "#0984e3",
+      "employees": [
+        {
+          "id": "bookkeeper",
+          "name": "경리 담당",
+          "role": "카드·계좌 내역을 정리하고 새는 구독료·이상 지출을 찾아 보고한다.",
+          "web": false,
+          "customer_facing": false,
+          "done": 0,
+          "routines": [
+            "0 10 1 * *"
+          ]
+        },
+        {
+          "id": "paperwork",
+          "name": "서류 담당",
+          "role": "상표 의견서·민간자격 신청·결제 대행사 가입 등 사업 서류 초안과 체크리스트를 만든다.",
+          "web": true,
+          "customer_facing": false,
+          "done": 0,
+          "routines": []
+        },
+        {
+          "id": "mail-manager",
+          "name": "메일 담당",
+          "role": "제안 메일 초안을 쓰고, 받은 메일을 분류해 답장이 필요한 것만 휴대폰으로 알린다.",
+          "web": false,
+          "customer_facing": true,
+          "done": 0,
+          "routines": [
+            "0 9,18 * * 1-5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ops",
+      "no": "⑤",
+      "name": "이걸 매일 돌리는 장치",
+      "color": "#2d3436",
+      "employees": [
+        {
+          "id": "chief",
+          "name": "비서실장",
+          "role": "사장의 한 줄 지시를 받아 알맞은 직원에게 나눠 주고, 매일 아침 브리핑을 보낸다.",
+          "web": false,
+          "customer_facing": false,
+          "done": 0,
+          "routines": [
+            "30 8 * * *"
+          ]
+        },
+        {
+          "id": "journal",
+          "name": "업무일지 담당",
+          "role": "하루 동안 팀이 한 일·배운 것을 스스로 업무일지로 남겨 다음에 다시 쓴다.",
+          "web": false,
+          "customer_facing": false,
+          "done": 0,
+          "routines": [
+            "50 23 * * *"
+          ]
+        }
+      ]
+    }
+  ],
+  "rooms": [
+    {
+      "id": "main",
+      "name": "본부 (사장 지시·브리핑)"
+    },
+    {
+      "id": "youtube",
+      "name": "유튜브 방"
+    },
+    {
+      "id": "blog",
+      "name": "블로그·SNS 방"
+    },
+    {
+      "id": "orders",
+      "name": "주문·광고 방"
+    },
+    {
+      "id": "chat",
+      "name": "자동 상담 방"
+    },
+    {
+      "id": "mail",
+      "name": "메일·서류 방"
+    }
+  ],
+  "recent": []
+}
