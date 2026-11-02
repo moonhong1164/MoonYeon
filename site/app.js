@@ -130,7 +130,7 @@
 
   const bank = SHOP.bank || {};
   $("#bank").innerHTML = bank.account
-    ? `입금 계좌: <b>${esc(bank.name)} ${esc(bank.account)}</b> (예금주 ${esc(bank.holder)})<br><span class="small">입금자명은 주문서 이름과 같게 해 주세요.</span>`
+    ? `입금 계좌: <b>${esc(bank.name)} ${esc(bank.account)}</b>${bank.holder ? ` (예금주 ${esc(bank.holder)})` : ""}<br><span class="small">입금자명은 주문서 이름과 같게 해 주세요.</span>`
     : "입금 계좌는 카카오톡으로 주문서를 보내 주시면 안내해 드려요.";
   if (SHOP.kakaoUrl) {
     $("#kakao-link").href = SHOP.kakaoUrl;
