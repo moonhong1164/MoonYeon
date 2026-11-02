@@ -78,3 +78,36 @@ test("관계: 목 일간에게 화는 식상, 금은 관성", () => {
   assert.strictEqual(Saju.relation(0, 3), "관성");
   assert.strictEqual(Saju.relation(0, 4), "인성");
 });
+
+test("십신: 갑목 일간 기준", () => {
+  assert.strictEqual(Saju.tenGod(0, 0), "비견");
+  assert.strictEqual(Saju.tenGod(0, 1), "겁재");
+  assert.strictEqual(Saju.tenGod(0, 2), "식신");
+  assert.strictEqual(Saju.tenGod(0, 3), "상관");
+  assert.strictEqual(Saju.tenGod(0, 4), "편재");
+  assert.strictEqual(Saju.tenGod(0, 5), "정재");
+  assert.strictEqual(Saju.tenGod(0, 6), "편관");
+  assert.strictEqual(Saju.tenGod(0, 7), "정관");
+  assert.strictEqual(Saju.tenGod(0, 8), "편인");
+  assert.strictEqual(Saju.tenGod(0, 9), "정인");
+  assert.strictEqual(Saju.tenGodOfBranch(0, 0), "정인"); // 子 본기 癸
+  assert.strictEqual(Saju.tenGodOfBranch(0, 6), "상관"); // 午 본기 丁
+});
+
+test("대운: 방향, 순서, 대운수", () => {
+  // 2024 갑진년(양년) — 남자는 순행, 여자는 역행
+  const m = Saju.calculate({ year: 2024, month: 3, day: 1, hour: 12, minute: 0, gender: "남" });
+  const f = Saju.calculate({ year: 2024, month: 3, day: 1, hour: 12, minute: 0, gender: "여" });
+  assert.strictEqual(m.daewoon.forward, true);
+  assert.strictEqual(f.daewoon.forward, false);
+  // 월주 병인 → 순행 첫 대운 정묘, 역행 첫 대운 을축
+  assert.strictEqual(Saju.label(m.pillars.month), "병인");
+  assert.strictEqual(Saju.label(m.daewoon.list[0]), "정묘");
+  assert.strictEqual(Saju.label(f.daewoon.list[0]), "을축");
+  // 3/1 → 경칩(3/5)까지 약 4일 → 남자 대운수 1, 입춘(2/4)부터 약 26일 → 여자 대운수 9
+  assert.strictEqual(m.daewoon.startAge, 1);
+  assert.strictEqual(f.daewoon.startAge, 9);
+  assert.deepStrictEqual(f.daewoon.list.slice(0, 3).map((d) => d.age), [9, 19, 29]);
+  // 성별이 없으면 대운 없음
+  assert.strictEqual(Saju.calculate({ year: 2024, month: 3, day: 1, timeUnknown: true }).daewoon, null);
+});

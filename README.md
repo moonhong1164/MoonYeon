@@ -83,6 +83,23 @@ python -m moonyeon bot
 
 **공개**: `.github/workflows/pages.yml`이 `main`에 `site/` 변경이 올라올 때마다 GitHub Pages로 배포합니다 → https://moonhong1164.github.io/MoonYeon/
 
+## 유료 풀이 만들기
+
+주문이 들어오면:
+
+```bash
+python -m moonyeon chart 1995-08-20 07:30 여 김하늘
+```
+
+→ 풀이에 필요한 사주 자료(원국·십신·오행·삼합/충·10년 대운·올해/내년 세운)를 뽑아 줍니다. (`node tools/chart.js`와 같음)
+
+```bash
+python -m moonyeon reading life 1995-08-20 07:30 여 김하늘 "올해 이직해도 될까요?"
+```
+
+→ '사주 풀이 작가' 직원이 `skills/saju-reading.md` 지침대로 초안을 쓰고 승인 대기함에 넣습니다 (Claude API 키 필요). 상품: `life`·`love`·`money`·`newyear`.
+API 키 없이도 이 채팅에서 "이 주문 평생 사주 풀이 써 줘"라고 하면 같은 지침으로 써 드립니다. 품질 기준은 `docs/samples/평생사주-견본.md`를 보세요.
+
 ## AI 직원 대시보드 (`dashboard/`)
 
 AI 직원 팀 현황 페이지(내부용)는 `dashboard/`에 있습니다. `python -m moonyeon stats`로 숫자를 갱신하고 `cd dashboard && python3 -m http.server 8000`으로 봅니다.

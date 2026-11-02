@@ -153,7 +153,25 @@
       counts[BRANCH_ELEMENT[p.branch]]++;
     }
 
+    // ── 대운: 양남음녀 순행, 음남양녀 역행. 절기까지 날수 ÷ 3 = 대운수
+    let daewoon = null;
+    if (input.gender === "남" || input.gender === "여") {
+      const yangYear = yearP.stem % 2 === 0;
+      const forward = (input.gender === "남") === yangYear;
+      const days = (forward ? nextTerm - utcMs : utcMs - prevTerm) / DAY_MS;
+      const startAge = Math.max(1, Math.round(days / 3));
+      const monthIdx = stemBranchIndex(monthP.stem, monthP.branch);
+      const list = [];
+      for (let i = 1; i <= 9; i++) {
+        const p = pillar(monthIdx + (forward ? i : -i));
+        const age = startAge + (i - 1) * 10;
+        list.push({ ...p, age, fromYear: year + age - 1 });
+      }
+      daewoon = { forward, startAge, list };
+    }
+
     return {
+      daewoon,
       input: { year, month, day, hour: timeUnknown ? null : hour, minute: timeUnknown ? null : minute, timeUnknown, useSolarTime, dst },
       pillars,
       dayMaster: dayP.stem,
@@ -174,6 +192,21 @@
     return ["비겁", "식상", "재성", "관성", "인성"][d];
   }
 
+  // 지지 속 본기(가장 큰 기운) 천간: 子癸 丑己 寅甲 卯乙 辰戊 巳丙 午丁 未己 申庚 酉辛 戌戊 亥壬
+  const BRANCH_MAIN_STEM = [9, 5, 0, 1, 4, 2, 3, 5, 6, 7, 4, 8];
+  const TEN_GODS = [["비견", "겁재"], ["식신", "상관"], ["편재", "정재"], ["편관", "정관"], ["편인", "정인"]];
+
+  /** 일간 기준 다른 천간의 십신 */
+  function tenGod(dayStem, otherStem) {
+    const d = mod(STEM_ELEMENT[otherStem] - STEM_ELEMENT[dayStem], 5);
+    return TEN_GODS[d][dayStem % 2 === otherStem % 2 ? 0 : 1];
+  }
+
+  /** 일간 기준 지지의 십신 (본기 기준) */
+  function tenGodOfBranch(dayStem, branch) {
+    return tenGod(dayStem, BRANCH_MAIN_STEM[branch]);
+  }
+
   function yearPillarOf(year) {
     return pillar(mod(year - 4, 60));
   }
@@ -186,7 +219,7 @@
   const Saju = {
     STEMS, STEMS_HANJA, BRANCHES, BRANCHES_HANJA, ANIMALS, ELEMENTS, ELEMENTS_HANJA,
     STEM_ELEMENT, BRANCH_ELEMENT, HOUR_NAMES,
-    calculate, relation, yearPillarOf, label, solarLongitude, findSolarTerm, ipchun, stemBranchIndex,
+    calculate, relation, tenGod, tenGodOfBranch, BRANCH_MAIN_STEM, yearPillarOf, label, solarLongitude, findSolarTerm, ipchun, stemBranchIndex,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = Saju;
