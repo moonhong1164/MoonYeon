@@ -80,7 +80,11 @@ python -m moonyeon stats
 cd site && python3 -m http.server 8000
 ```
 
-`site/` 폴더를 GitHub Pages·Netlify 등에 그대로 올리면 됩니다. `stats`를 다시 실행할 때마다 직원 수·루틴·업무일지 숫자가 갱신됩니다.
+**GitHub Pages 공개**: `.github/workflows/pages.yml`이 `main`에 `site/` 변경이 올라올 때마다 자동 배포합니다.
+처음 한 번만 저장소 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 바꿔 주세요.
+주소는 `https://moonhong1164.github.io/MoonYeon/` 입니다.
+
+숫자 갱신: 서버에서 `python -m moonyeon stats` 실행 → 바뀐 `site/data/stats.json`을 커밋·푸시하면 홈페이지에 반영됩니다.
 
 ## 테스트
 
