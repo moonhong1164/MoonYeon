@@ -203,3 +203,21 @@ dialog::backdrop { background: #17153acc; }
   .card { padding: 18px 16px; }
   .pillars { gap: 6px; }
 }
+
+/* 생년월일: 양력/음력 + 선택 상자 */
+.birth { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.birth-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.birth-head .label { font-weight: 700; }
+.seg { display: inline-flex; background: var(--bg-2); border-radius: 999px; padding: 3px; }
+.seg label { cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: .9rem; color: var(--ink-soft); }
+.seg input:checked + span { background: var(--main); color: #fff; font-weight: 700; }
+.seg input:focus-visible + span { outline: 2px solid var(--main); outline-offset: 2px; }
+.ymd { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; }
+.ymd select { font: inherit; padding: 11px 10px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); width: 100%; }
+.ymd select:focus { outline: 2px solid #5a4fcf55; border-color: var(--main); }
+
+/* 결과 공유 */
+.share-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.share-actions .btn { padding: 10px 18px; }

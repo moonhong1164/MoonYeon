@@ -20,31 +20,60 @@
 
   // ── 무료 사주 ────────────────────────────────────────
   const form = $("#saju-form");
-  const timeInput = form.elements.time;
-  form.elements.unknown.addEventListener("change", (e) => (timeInput.disabled = e.target.checked));
+  const f = form.elements;
+  const timeInput = f.time;
+  f.unknown.addEventListener("change", (e) => (timeInput.disabled = e.target.checked));
 
-  let last = null; // 주문서 미리 채우기용
+  // 생년월일 선택 상자
+  const thisYear = new Date().getFullYear();
+  const opt = (v, t, sel) => `<option value="${v}"${sel ? " selected" : ""}>${t}</option>`;
+  f.y.innerHTML = opt("", "년", true) + Array.from({ length: thisYear - 1901 + 1 }, (_, i) => thisYear - i).map((y) => opt(y, `${y}년`)).join("");
+  f.m.innerHTML = opt("", "월", true) + Array.from({ length: 12 }, (_, i) => opt(i + 1, `${i + 1}월`)).join("");
+  f.d.innerHTML = opt("", "일", true) + Array.from({ length: 31 }, (_, i) => opt(i + 1, `${i + 1}일`)).join("");
+  const isLunar = () => f.cal.value === "lunar";
+  form.querySelectorAll("input[name=cal]").forEach((el) =>
+    el.addEventListener("change", () => {
+      form.querySelector(".leap").hidden = !isLunar();
+      if (!isLunar()) f.leap.checked = false;
+    })
+  );
+
+  let last = null; // 주문서 미리 채우기·공유 카드용
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     $("#form-error").textContent = "";
-    const f = form.elements;
-    if (!f.birth.value) {
-      $("#form-error").textContent = "생년월일을 입력해 주세요.";
+    if (!f.y.value || !f.m.value || !f.d.value) {
+      $("#form-error").textContent = "생년월일을 모두 골라 주세요.";
       return;
     }
-    const [year, month, day] = f.birth.value.split("-").map(Number);
+    const by = Number(f.y.value), bm = Number(f.m.value), bd = Number(f.d.value);
     const unknown = f.unknown.checked;
     const [hour, minute] = (f.time.value || "12:00").split(":").map(Number);
+    let solar = { year: by, month: bm, day: bd };
+    let lunarText = "";
     let r;
     try {
-      r = S.calculate({ year, month, day, hour, minute, timeUnknown: unknown, solarTime: f.solar.checked });
+      if (isLunar()) {
+        solar = window.Lunar.lunarToSolar(by, bm, bd, f.leap.checked);
+        lunarText = `음력 ${by}.${bm}.${bd}${f.leap.checked ? "(윤달)" : ""}`;
+      }
+      r = S.calculate({ ...solar, hour, minute, timeUnknown: unknown, solarTime: f.solar.checked });
     } catch (err) {
       $("#form-error").textContent = err.message;
       return;
     }
-    last = { name: f.name.value.trim(), gender: f.gender.value, birth: f.birth.value, time: unknown ? "모름" : f.time.value };
-    render(r, last.name);
+    const pad = (n) => String(n).padStart(2, "0");
+    const solarStr = `${solar.year}-${pad(solar.month)}-${pad(solar.day)}`;
+    last = {
+      name: f.name.value.trim(),
+      gender: f.gender.value,
+      birth: lunarText ? `${lunarText} (양력 ${solarStr})` : `${solarStr} (양력)`,
+      time: unknown ? "모름" : f.time.value,
+      result: r,
+      lunarText,
+    };
+    render(r, last.name, lunarText);
   });
 
   function glyph(p, which) {
@@ -55,7 +84,7 @@
     return `<div class="glyph e${e}"><span class="h">${h}</span><span class="k">${k} · ${S.ELEMENTS[e]}</span></div>`;
   }
 
-  function render(r, name) {
+  function render(r, name, lunarText) {
     const reading = R.build(r, S);
     const who = name ? `${esc(name)}님` : "당신";
     const dmWord = S.STEMS[r.dayMaster] + S.ELEMENTS[r.dayMasterElement];
@@ -77,7 +106,7 @@
     const notes = [];
     notes.push(r.input.useSolarTime ? "서울 기준 보정" : "보정 없음");
     if (r.input.dst) notes.push("서머타임 1시간 뺌");
-    $("#calendar-note").textContent = `(양력 ${r.input.year}.${r.input.month}.${r.input.day}${r.input.timeUnknown ? "" : ` ${String(r.input.hour).padStart(2, "0")}:${String(r.input.minute).padStart(2, "0")}`} · ${notes.join(" · ")})`;
+    $("#calendar-note").textContent = `(${lunarText ? lunarText + " → " : ""}양력 ${r.input.year}.${r.input.month}.${r.input.day}${r.input.timeUnknown ? "" : ` ${String(r.input.hour).padStart(2, "0")}:${String(r.input.minute).padStart(2, "0")}`} · ${notes.join(" · ")})`;
     $("#boundary-note").textContent = r.nearTermBoundary
       ? "⚠️ 절기가 바뀌는 시각과 가까운 때에 태어났어요. 몇십 분 차이로 월주가 달라질 수 있으니, 자세한 풀이에서 정확히 짚어 드려요."
       : "가운데 굵은 테두리가 '나 자신'을 뜻하는 일간이에요.";
@@ -168,7 +197,7 @@
     if (last) {
       of.elements.name.value ||= last.name;
       of.elements.gender.value = last.gender;
-      of.elements.birth.value ||= `${last.birth} (양력)`;
+      of.elements.birth.value ||= last.birth;
       of.elements.time.value ||= last.time;
     }
     refresh();
@@ -186,6 +215,137 @@
       $("#copy-done").textContent = "복사했어요! 카카오톡 채팅창에 붙여 넣어 보내 주세요.";
     } catch {
       $("#copy-done").textContent = "자동 복사가 안 돼요. 위 주문서를 길게 눌러 직접 복사해 주세요.";
+    }
+  });
+  // ── 결과 카드 이미지 (공유·저장) ──────────────────────
+  const ELEMENT_COLORS = ["#4f9a6a", "#e2604c", "#c99a3d", "#9aa0ab", "#36508a"];
+  const siteUrl = () => location.origin + location.pathname;
+
+  function rrect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  async function drawCard() {
+    if (!last) return null;
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const r = last.result;
+    const reading = R.build(r, S);
+    const c = $("#share-canvas");
+    const ctx = c.getContext("2d");
+    const W = c.width, H = c.height;
+    const serif = '"Noto Serif KR", serif', sans = '"Noto Sans KR", sans-serif';
+
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#17153a");
+    g.addColorStop(1, "#2a2462");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#ffffff55";
+    [[120, 160, 2], [930, 120, 3], [820, 300, 2], [160, 520, 2], [980, 620, 2], [70, 980, 3]].forEach(([x, y, rad]) => {
+      ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // 달 + 이름
+    const moon = ctx.createRadialGradient(W / 2 - 30, 190, 10, W / 2, 210, 110);
+    moon.addColorStop(0, "#fffbea"); moon.addColorStop(1, "#e9c46a");
+    ctx.fillStyle = moon;
+    ctx.beginPath(); ctx.arc(W / 2, 210, 100, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#17153a";
+    ctx.textAlign = "center";
+    ctx.font = `900 64px ${serif}`;
+    ctx.fillText("월연", W / 2, 232);
+
+    ctx.fillStyle = "#c9c5e6";
+    ctx.font = `500 34px ${sans}`;
+    ctx.fillText(`${last.name ? last.name + "님" : "나"}의 사주 · ${r.animal}띠`, W / 2, 380);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `900 50px ${serif}`;
+    ctx.fillText(reading.dayMaster.title, W / 2, 452);
+
+    // 여덟 글자
+    const cols = [r.pillars.hour, r.pillars.day, r.pillars.month, r.pillars.year];
+    const heads = ["시", "일", "월", "년"];
+    const bw = 190, bh = 150, gap = 22, x0 = (W - (bw * 4 + gap * 3)) / 2, y0 = 530;
+    cols.forEach((p, i) => {
+      const x = x0 + i * (bw + gap);
+      ctx.fillStyle = "#b6b1d8"; ctx.font = `500 28px ${sans}`;
+      ctx.fillText(heads[i] + "주", x + bw / 2, y0 - 16);
+      [["stem", 0], ["branch", 1]].forEach(([which, row]) => {
+        const y = y0 + row * (bh + 16);
+        let color = "#3a3566", hanja = "?", kor = "모름";
+        if (p) {
+          const e = which === "stem" ? S.STEM_ELEMENT[p.stem] : S.BRANCH_ELEMENT[p.branch];
+          color = ELEMENT_COLORS[e];
+          hanja = which === "stem" ? S.STEMS_HANJA[p.stem] : S.BRANCHES_HANJA[p.branch];
+          kor = (which === "stem" ? S.STEMS[p.stem] : S.BRANCHES[p.branch]) + " · " + S.ELEMENTS[e];
+        }
+        ctx.fillStyle = color; rrect(ctx, x, y, bw, bh, 22); ctx.fill();
+        if (i === 1 && row === 0) { ctx.strokeStyle = "#f3d27a"; ctx.lineWidth = 6; rrect(ctx, x - 6, y - 6, bw + 12, bh + 12, 26); ctx.stroke(); }
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `700 80px ${serif}`; ctx.fillText(hanja, x + bw / 2, y + 92);
+        ctx.font = `500 26px ${sans}`; ctx.fillText(kor, x + bw / 2, y + 132);
+      });
+    });
+
+    // 오행 막대
+    const total = r.counts.reduce((a, b) => a + b, 0);
+    const by0 = 900, barX = 250, barW = 640;
+    r.counts.forEach((n, i) => {
+      const y = by0 + i * 52;
+      ctx.textAlign = "left"; ctx.fillStyle = "#e3e0f5"; ctx.font = `500 30px ${sans}`;
+      ctx.fillText(`${S.ELEMENTS[i]}(${S.ELEMENTS_HANJA[i]})`, 150, y + 26);
+      ctx.fillStyle = "#ffffff1f"; rrect(ctx, barX, y + 6, barW, 24, 12); ctx.fill();
+      if (n) { ctx.fillStyle = ELEMENT_COLORS[i]; rrect(ctx, barX, y + 6, Math.max(24, (barW * n) / total), 24, 12); ctx.fill(); }
+      ctx.textAlign = "right"; ctx.fillStyle = "#ffffff"; ctx.fillText(String(n), 940, y + 28);
+    });
+
+    // 한 줄 + 주소
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#f3d27a"; ctx.font = `700 32px ${sans}`;
+    ctx.fillText(`타고난 강점 · ${reading.dayMaster.good}`, W / 2, 1210);
+    ctx.fillStyle = "#9d98c4"; ctx.font = `500 26px ${sans}`;
+    ctx.fillText(`${SHOP.name} · ${siteUrl().replace(/^https?:\/\//, "")}`, W / 2, 1290);
+    return c;
+  }
+
+  const toBlob = (c) => new Promise((res) => c.toBlob(res, "image/png"));
+  const shareDone = (t) => ($("#share-done").textContent = t);
+
+  $("#save-image").addEventListener("click", async () => {
+    const c = await drawCard();
+    if (!c) return;
+    const a = document.createElement("a");
+    a.href = c.toDataURL("image/png");
+    a.download = "wolyeon-saju.png";
+    a.click();
+    shareDone("이미지를 저장했어요. 휴대폰에서는 사진 앱이나 다운로드 폴더를 확인해 주세요.");
+  });
+
+  $("#share-image").addEventListener("click", async () => {
+    const c = await drawCard();
+    if (!c) return;
+    const file = new File([await toBlob(c)], "wolyeon-saju.png", { type: "image/png" });
+    const data = { files: [file], title: `${SHOP.name} — 나의 사주`, text: `나도 사주 봤어! 무료로 보기 → ${siteUrl()}` };
+    if (navigator.canShare && navigator.canShare(data)) {
+      try { await navigator.share(data); shareDone(""); } catch { /* 사용자가 취소 */ }
+    } else {
+      $("#save-image").click();
+      shareDone("이 브라우저에서는 바로 공유가 안 돼서 이미지를 저장했어요. 저장한 사진을 카톡이나 인스타에 올려 주세요.");
+    }
+  });
+
+  $("#copy-link").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(siteUrl());
+      shareDone("링크를 복사했어요. 친구에게 붙여 넣어 보내 주세요.");
+    } catch {
+      shareDone(siteUrl());
     }
   });
 })();
