@@ -99,6 +99,22 @@ function chart({ birth, time = "모름", gender, name = "", now = new Date() }) 
     const p = S.yearPillarOf(y);
     lines.push(`- ${y}년 ${S.label(p)}(${S.label(p, true)}): 천간 ${S.tenGod(dm, p.stem)} · 지지 ${S.tenGodOfBranch(dm, p.branch)}`);
   }
+  // 내년 월운: 절기 기준 달마다 들어오는 기운 (신년운세용)
+  const ny = thisYear + 1;
+  lines.push("");
+  lines.push(`## ${ny}년 월운 (달마다 들어오는 기운, 절기 기준)`);
+  lines.push("");
+  lines.push("| 양력 달 | 월주 | 천간 십신 | 지지 십신 | 원국 지지와 |");
+  lines.push("|---|---|---|---|---|");
+  for (let m = 1; m <= 12; m++) {
+    const mp = S.calculate({ year: ny, month: m, day: 20, timeUnknown: true }).pillars.month;
+    const notes = [];
+    for (const b of branches) {
+      if ((b + 6) % 12 === mp.branch) notes.push(`${S.BRANCHES[b]}${S.BRANCHES[mp.branch]} 충`);
+      for (const [set, e] of SAMHAP) if (set.includes(b) && set.includes(mp.branch) && b !== mp.branch) notes.push(`${S.BRANCHES[b]}${S.BRANCHES[mp.branch]} 반합(${S.ELEMENTS[e]})`);
+    }
+    lines.push(`| ${m}월 (${m === 1 ? "1/6 무렵 소한~" : `${m}월 초 ${["", "", "입춘", "경칩", "청명", "입하", "망종", "소서", "입추", "백로", "한로", "입동", "대설"][m]}~`}) | ${S.label(mp)}(${S.label(mp, true)}) | ${S.tenGod(dm, mp.stem)} | ${S.tenGodOfBranch(dm, mp.branch)} | ${[...new Set(notes)].join(", ") || "-"} |`);
+  }
   return lines.join("\n");
 }
 
