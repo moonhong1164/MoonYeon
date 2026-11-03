@@ -13,6 +13,18 @@
   };
   const won = (n) => n.toLocaleString("ko-KR") + "원";
 
+  // ── 방문자 분석 (config.js 의 analytics 코드가 있을 때만) ──
+  const track = (name) => {
+    try { window.goatcounter && window.goatcounter.count && window.goatcounter.count({ path: name, event: true }); } catch {}
+  };
+  if (SHOP.analytics && /^[a-z0-9-]+$/.test(SHOP.analytics)) {
+    const sc = document.createElement("script");
+    sc.async = true;
+    sc.src = "https://gc.zgo.at/count.js";
+    sc.dataset.goatcounter = `https://${SHOP.analytics}.goatcounter.com/count`;
+    document.head.appendChild(sc);
+  }
+
   // 가게 이름
   document.querySelectorAll("[data-shop=name]").forEach((el) => (el.textContent = SHOP.name));
   document.title = SHOP.name;
@@ -74,6 +86,7 @@
       lunarText,
     };
     render(r, last.name, lunarText);
+    track(isLunar() ? "free-saju-lunar" : "free-saju");
   });
 
   function glyph(p, which) {
@@ -202,7 +215,10 @@
     }
     refresh();
     dialog.showModal();
+    track(`order-open-${btn.dataset.order}`);
   });
+
+  $("#kakao-link").addEventListener("click", () => track("order-kakao"));
 
   $("#copy-order").addEventListener("click", async () => {
     const f = of.elements;
@@ -328,6 +344,7 @@
   });
 
   $("#share-image").addEventListener("click", async () => {
+    track("share-image");
     const c = await drawCard();
     if (!c) return;
     const file = new File([await toBlob(c)], "wolyeon-saju.png", { type: "image/png" });
