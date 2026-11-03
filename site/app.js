@@ -27,6 +27,24 @@
 
   // 가게 이름
   document.querySelectorAll("[data-shop=name]").forEach((el) => (el.textContent = SHOP.name));
+
+  // ── 시즌 배너 ───────────────────────────────────────
+  (function promo() {
+    const p = SHOP.promo;
+    if (!p || !p.enabled) return;
+    if (p.until && new Date() > new Date(`${p.until}T23:59:59+09:00`)) return;
+    const key = `promo-closed:${p.title}`;
+    try { if (sessionStorage.getItem(key)) return; } catch {}
+    $("#promo-title").textContent = p.title;
+    $("#promo-sub").textContent = p.sub || "";
+    $("#promo-btn").dataset.order = p.product;
+    $("#promo").hidden = false;
+    $("#promo-btn").addEventListener("click", () => track(`promo-${p.product}`));
+    $("#promo-close").addEventListener("click", () => {
+      $("#promo").hidden = true;
+      try { sessionStorage.setItem(key, "1"); } catch {}
+    });
+  })();
   document.title = SHOP.name;
   if (SHOP.hours) $("#hours-text").textContent = SHOP.hours;
 

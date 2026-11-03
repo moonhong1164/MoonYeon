@@ -221,3 +221,16 @@ dialog::backdrop { background: #17153acc; }
 /* 결과 공유 */
 .share-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .share-actions .btn { padding: 10px 18px; }
+
+/* 시즌 배너 */
+.promo { background: linear-gradient(90deg, #f3d27a, #ffe9a8); color: var(--night); }
+.promo-inner { display: flex; align-items: center; gap: 12px; min-height: 52px; padding-top: 8px; padding-bottom: 8px; }
+.promo p { margin: 0; flex: 1; font-size: .95rem; line-height: 1.45; }
+.promo p b { font-weight: 900; margin-right: 6px; }
+.promo-moon { font-size: 1.2rem; }
+.promo-btn { flex: none; border: 0; background: var(--night); color: #fff; font: inherit; font-weight: 700; font-size: .9rem; padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+.promo-x { flex: none; border: 0; background: none; color: var(--night); font-size: 1.4rem; line-height: 1; cursor: pointer; opacity: .6; padding: 4px; }
+@media (max-width: 520px) {
+  .promo p span { display: block; font-size: .82rem; }
+  .promo-moon { display: none; }
+}
