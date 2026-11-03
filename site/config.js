@@ -15,7 +15,7 @@ window.SHOP = {
 
   // 방문자 분석 (GoatCounter 무료) — https://www.goatcounter.com 가입 후 정한 코드만 넣으세요. 예: "wolyeon"
   // 비워 두면 분석을 쓰지 않아요. 개인정보(생년월일 등)는 보내지 않고, 방문·버튼 클릭 수만 셉니다.
-  analytics: "",
+  analytics: "moonyeon",
 
   // 상담 응답 시간 안내
   hours: "평일 오전 10시 ~ 밤 10시 (주문 후 24~48시간 안에 풀이를 보내 드려요)",
