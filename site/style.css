@@ -325,3 +325,79 @@ dialog::backdrop { background: #0f241bcc; }
 .locked p { color: #c9d6cd; line-height: 1.8; margin: 0 0 18px; }
 .locked p b { color: var(--gold); }
 .locked .more { display: block; margin-top: 12px; color: #c9d6cd; }
+
+/* 상품 카드 버튼 */
+.product-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.product .product-actions .btn { align-self: auto; }
+.product .product-actions .btn:not(.btn-main) { background: var(--card); border-color: var(--line); color: var(--ink); }
+.product .product-actions .btn-main { background: var(--gold); border-color: var(--gold-2); color: var(--gold-ink); }
+
+/* 상품 상세 시트 */
+body.locked-scroll { overflow: hidden; }
+.sheet { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; color: #ece8f6;
+  background: radial-gradient(120% 60% at 80% 0%, #3b2a63 0%, transparent 60%), radial-gradient(90% 50% at 0% 40%, #1d2f5e 0%, transparent 60%), #0d0b1d; }
+.sheet-bar { flex: none; display: grid; grid-template-columns: 80px 1fr 80px; align-items: center; height: 56px; padding: 0 12px; background: #0d0b1dcc; backdrop-filter: blur(8px); border-bottom: 1px solid #ffffff14; }
+.sheet-bar b { text-align: center; font-family: var(--serif); font-size: 1.05rem; color: #fff; }
+.sheet-back, .sheet-share { border: 0; background: none; color: #b9a6ff; font: inherit; font-weight: 700; cursor: pointer; padding: 8px; }
+.sheet-back { text-align: left; }
+.sheet-share { text-align: right; }
+.sheet-body { flex: 1; overflow-y: auto; padding: 20px 16px 120px; max-width: 640px; width: 100%; margin: 0 auto; }
+.sh-hero, .sh-box { border: 1px solid #ffffff1a; border-radius: 26px; padding: 26px 20px; margin-bottom: 18px; background: linear-gradient(180deg, #ffffff0d, #ffffff05); }
+.sh-hero { text-align: center; background: linear-gradient(180deg, #3a2b5a, #1c1636); }
+.sh-emblem { width: 150px; height: 150px; margin: 4px auto 18px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 40% 35%, #26305a, #141a3a); border: 3px solid #e6c14f;
+  box-shadow: inset 0 0 0 8px #141a3a, inset 0 0 0 10px #e6c14f88, 0 10px 30px #00000066; }
+.sh-emblem span { font-family: var(--serif); font-weight: 900; font-size: 4rem; color: #f2d46b; }
+.sh-hero h2 { font-family: var(--serif); font-size: 1.8rem; margin: 0; color: #fff; }
+.sh-hero > p { margin: 6px 0 16px; color: #cfc7e8; }
+.sh-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.sh-chips span { background: #ffffff14; border-radius: 999px; padding: 6px 14px; font-size: .88rem; }
+.sh-price { margin: 18px 0 4px; font-size: 2rem; font-weight: 900; color: #f2d46b; }
+.sh-price small { display: block; font-size: .85rem; font-weight: 400; color: #a9a0cc; }
+.sh-delivery { margin: 8px 0 0; font-size: .85rem; color: #a9a0cc; }
+.sh-delivery span { background: #ffffff1a; color: #fff; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-right: 4px; }
+.sh-delivery em { font-style: normal; }
+.sh-box h3 { margin: 0 0 14px; padding-bottom: 12px; border-bottom: 1px dashed #ffffff26; font-family: var(--serif); font-size: 1.2rem; color: #fff; }
+.sh-toc { list-style: none; margin: 0; padding: 4px 18px; background: #ffffff0a; border: 1px solid #ffffff14; border-radius: 18px; }
+.sh-toc li { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid #ffffff12; }
+.sh-toc li:last-child { border-bottom: 0; }
+.sh-toc .n { width: 24px; flex: none; font-weight: 900; color: #ff7eb3; }
+.sh-toc b { display: block; color: #fff; }
+.sh-toc small { color: #b4acd2; }
+.sh-sample { position: relative; padding: 18px 18px 18px 40px; background: #ffffff0a; border: 1px solid #ffffff14; border-radius: 18px; }
+.sh-sample::before { content: ""; position: absolute; left: 18px; top: 24px; bottom: 24px; width: 2px; background: #8b7cf0; border-radius: 2px; }
+.sh-sample::after { content: ""; position: absolute; left: 12px; top: 18px; width: 14px; height: 14px; border-radius: 50%; background: #b9a6ff; box-shadow: 0 0 0 4px #0d0b1d; }
+.sh-sample-tag { display: inline-block; border: 1.5px solid #b9a6ff; color: #cbbcff; border-radius: 12px; padding: 4px 14px; font-weight: 700; margin-bottom: 10px; }
+.sh-sample p { margin: 0; line-height: 1.85; }
+.sh-blur { margin-top: 8px !important; filter: blur(6px); user-select: none; opacity: .7; }
+.sh-note { text-align: center; font-size: .82rem; color: #a9a0cc; margin: 12px 0 0; }
+.sh-teaser { background: linear-gradient(180deg, #3a2b5a, #251d45); border: 1px solid #8b7cf066; border-radius: 18px; padding: 16px; }
+.sh-teaser .sh-note { margin: 0 0 12px; }
+.sh-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+.sheet .seg { background: #ffffff14; }
+.sheet .seg span { color: #cfc7e8; }
+.sheet .seg input:checked + span { background: #8b7cf0; color: #fff; }
+.sheet .ymd select { background: #ffffff10; color: #fff; border-color: #ffffff26; }
+.sheet .ymd option { color: #111; }
+.sheet .btn-gold { background: linear-gradient(90deg, #ff7eb3, #b98bff); border: 0; color: #fff; box-shadow: 0 8px 20px #b98bff44; }
+.sh-teaser-result { margin-top: 14px; background: #ffffff0a; border: 1px solid #f2d46b55; border-radius: 18px; padding: 16px; }
+.sh-teaser-result p { margin: 4px 0 14px; line-height: 1.8; }
+.sh-teaser-result p b { color: #f2d46b; }
+.tz-row { display: flex; justify-content: space-between; gap: 8px; font-size: .9rem; }
+.tz-row span { color: #a9a0cc; }
+.tz-row b { color: #fff; }
+.tz-years { margin: 6px 0 14px; padding-left: 18px; }
+.tz-years li { padding: 3px 0; }
+.tz-years b { color: #f2d46b; }
+.tz-years small { color: #b4acd2; }
+.tz-locked { font-size: .85rem; color: #cfc7e8; background: #ffffff0d; border-radius: 12px; padding: 10px 12px; }
+.sh-rec { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.sh-rec li { background: #ffffff0a; border: 1px solid #ffffff14; border-radius: 16px; padding: 14px 18px; color: #e6e1f5; }
+.sh-rec b { color: #f2d46b; }
+.sh-refund { text-align: center; margin: 24px 0; }
+.sh-refund a { color: #a9a0cc; }
+.sh-buy { position: absolute; left: 50%; bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(608px, calc(100% - 24px)); display: flex; align-items: center; gap: 14px; padding: 12px 12px 12px 22px; background: #15122bf2; border: 1px solid #ffffff1f; border-radius: 22px; box-shadow: 0 10px 30px #00000088; }
+.sh-buy div { display: flex; flex-direction: column; line-height: 1.3; }
+.sh-buy small { color: #a9a0cc; font-size: .8rem; }
+.sh-buy b { color: #fff; font-size: 1.15rem; }
+.sh-buy .btn { flex: 1; justify-content: center; padding: 14px; font-size: 1.02rem; }

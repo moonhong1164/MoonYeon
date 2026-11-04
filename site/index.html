@@ -302,6 +302,66 @@
     </div>
   </footer>
 
+  <!-- 상품 상세 -->
+  <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title">
+    <div class="sheet-bar">
+      <button type="button" class="sheet-back" id="sheet-close">‹ 홈</button>
+      <b id="sheet-bar-title"></b>
+      <button type="button" class="sheet-share" id="sheet-share">공유</button>
+    </div>
+    <div class="sheet-body">
+      <section class="sh-hero">
+        <div class="sh-emblem" aria-hidden="true"><span id="sh-emblem"></span></div>
+        <h2 id="sh-title"></h2>
+        <p id="sh-sub"></p>
+        <div class="sh-chips" id="sh-chips"></div>
+        <div class="sh-price" id="sh-price"></div>
+        <p class="sh-delivery"><span>받는 법</span> <em id="sh-delivery"></em></p>
+      </section>
+
+      <section class="sh-box">
+        <h3>📜 <span id="sh-toc-title"></span></h3>
+        <ol class="sh-toc" id="sh-toc"></ol>
+      </section>
+
+      <section class="sh-box">
+        <h3>👀 풀이는 이런 느낌이에요</h3>
+        <div class="sh-sample">
+          <span class="sh-sample-tag" id="sh-sample-tag"></span>
+          <p id="sh-sample-text"></p>
+          <p class="sh-blur" id="sh-sample-hidden" aria-hidden="true"></p>
+        </div>
+        <p class="sh-note">실제 풀이는 내 생일·태어난 시간으로 새로 써 드려요 (견본 예시 문장)</p>
+      </section>
+
+      <section class="sh-box" id="sh-teaser-box" hidden>
+        <h3>🎂 내 생일로 맛보기</h3>
+        <form class="sh-teaser" id="sh-teaser-form" autocomplete="off">
+          <p class="sh-note">생일만 넣으면 배우자 자리와 인연이 오는 해를 바로 보여 드려요 · 무료 · 저장 안 함</p>
+          <div class="sh-row">
+            <span class="seg"><label><input type="radio" name="tg" value="여" checked><span>여자</span></label><label><input type="radio" name="tg" value="남"><span>남자</span></label></span>
+            <span class="seg"><label><input type="radio" name="tcal" value="solar" checked><span>양력</span></label><label><input type="radio" name="tcal" value="lunar"><span>음력</span></label></span>
+          </div>
+          <div class="ymd"><select name="ty" aria-label="태어난 해"></select><select name="tm" aria-label="태어난 달"></select><select name="td" aria-label="태어난 날"></select></div>
+          <button type="submit" class="btn btn-gold wide">🎂 생일 넣고 바로 보기</button>
+          <p class="error" id="sh-teaser-error" role="alert"></p>
+        </form>
+        <div class="sh-teaser-result" id="sh-teaser-result" hidden></div>
+      </section>
+
+      <section class="sh-box">
+        <h3>⭐ 이런 분께 추천해요</h3>
+        <ul class="sh-rec" id="sh-rec"></ul>
+      </section>
+
+      <p class="sh-refund"><a href="#faq" id="sh-refund">환불 안내 ›</a></p>
+    </div>
+    <div class="sh-buy">
+      <div><small id="sh-buy-name"></small><b id="sh-buy-price"></b></div>
+      <button type="button" class="btn btn-gold" id="sh-buy">생일 적고 주문하기</button>
+    </div>
+  </div>
+
   <!-- 주문서 -->
   <dialog id="order">
     <form method="dialog" id="order-form" class="order">
@@ -340,6 +400,7 @@
   <script src="lunar.js"></script>
   <script src="reading.js"></script>
   <script src="monthly.js"></script>
+  <script src="destiny.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

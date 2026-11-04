@@ -264,9 +264,126 @@
         <div class="price">${won(p.price)} <small>/ 1회</small></div>
         <p>${esc(p.desc)}</p>
         <ul>${p.includes.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
-        <button class="btn btn-main" data-order="${esc(p.id)}">이 풀이 주문하기</button>
+        <div class="product-actions">
+          <button class="btn btn-main" data-detail="${esc(p.id)}">자세히 보기</button>
+          <button class="btn" data-order="${esc(p.id)}">바로 주문</button>
+        </div>
       </article>`)
     .join("");
+
+  // ── 상품 상세 페이지 ───────────────────────────────
+  const sheet = $("#sheet");
+  let sheetProduct = null;
+  let sheetPushed = false; // 사이트 안에서 열었으면 true → 닫을 때 뒤로 가기, 링크로 바로 들어왔으면 주소만 정리
+  const tf = $("#sh-teaser-form").elements;
+  (function fillTeaserSelects() {
+    const yNow = new Date().getFullYear();
+    const o = (v, t, sel) => `<option value="${v}"${sel ? " selected" : ""}>${t}</option>`;
+    tf.ty.innerHTML = o("", "년", true) + Array.from({ length: yNow - 1901 + 1 }, (_, i) => yNow - i).map((y) => o(y, `${y}년`)).join("");
+    tf.tm.innerHTML = o("", "월", true) + Array.from({ length: 12 }, (_, i) => o(i + 1, `${i + 1}월`)).join("");
+    tf.td.innerHTML = o("", "일", true) + Array.from({ length: 31 }, (_, i) => o(i + 1, `${i + 1}일`)).join("");
+  })();
+
+  function openSheet(id, push = true) {
+    const p = SHOP.products.find((x) => x.id === id);
+    if (!p) return;
+    sheetProduct = p;
+    $("#sheet-bar-title").textContent = p.name;
+    $("#sh-emblem").textContent = p.emblem || "月";
+    $("#sh-title").textContent = p.name;
+    $("#sh-sub").textContent = p.subtitle || "";
+    const n = (p.chapters || []).length;
+    $("#sh-chips").innerHTML = [n ? `📖 ${n}장 풀이` : "", "💬 카톡으로 받기", "🗂️ 평생 소장"].filter(Boolean).map((c) => `<span>${c}</span>`).join("");
+    $("#sh-price").innerHTML = `${won(p.price)} <small>${n ? `${n}장 리포트` : ""}</small>`;
+    $("#sh-delivery").textContent = SHOP.delivery || "";
+    $("#sh-toc-title").textContent = `${p.name}${n ? ` · ${n}장` : ""}`;
+    $("#sh-toc").innerHTML = (p.chapters || []).map(([t, d], i) => `<li><span class="n">${i + 1}</span><div><b>${esc(t)}</b><small>${esc(d)}</small></div></li>`).join("");
+    const sm = p.sample || {};
+    $("#sh-sample-tag").textContent = sm.chapter || p.name;
+    $("#sh-sample-text").textContent = sm.text || p.desc;
+    $("#sh-sample-hidden").textContent = sm.hidden || "";
+    $("#sh-rec").innerHTML = (p.recommend || []).map((r) => `<li>${r}</li>`).join("");
+    $("#sh-teaser-box").hidden = p.teaser !== "destiny";
+    $("#sh-teaser-result").hidden = true;
+    $("#sh-buy-name").textContent = p.name;
+    $("#sh-buy-price").textContent = won(p.price);
+    if (last && last.result && p.teaser === "destiny") {
+      tf.ty.value = last.result.input.year; tf.tm.value = last.result.input.month; tf.td.value = last.result.input.day;
+      tf.tg.value = last.gender;
+    }
+    sheet.hidden = false;
+    document.body.classList.add("locked-scroll");
+    sheet.querySelector(".sheet-body").scrollTop = 0;
+    if (push && location.hash !== `#product=${id}`) { history.pushState(null, "", `#product=${id}`); sheetPushed = true; }
+    track(`detail-${id}`);
+  }
+  function closeSheet(fromHistory = false) {
+    if (sheet.hidden) return;
+    sheet.hidden = true;
+    document.body.classList.remove("locked-scroll");
+    if (!fromHistory && location.hash.startsWith("#product=")) {
+      if (sheetPushed) history.back();
+      else history.replaceState(null, "", location.pathname + location.search);
+    }
+    sheetPushed = false;
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-detail]");
+    if (b) openSheet(b.dataset.detail);
+  });
+  $("#sheet-close").addEventListener("click", () => closeSheet());
+  $("#sh-refund").addEventListener("click", () => closeSheet());
+  $("#sh-buy").addEventListener("click", () => {
+    const id = sheetProduct.id;
+    const btn = document.createElement("button");
+    btn.dataset.order = id;
+    btn.hidden = true;
+    document.body.appendChild(btn);
+    btn.click();
+    btn.remove();
+  });
+  $("#sheet-share").addEventListener("click", async () => {
+    const url = `${location.origin}${location.pathname}#product=${sheetProduct.id}`;
+    const data = { title: `${SHOP.name} · ${sheetProduct.name}`, text: sheetProduct.subtitle || "", url };
+    try {
+      if (navigator.share) await navigator.share(data);
+      else { await navigator.clipboard.writeText(url); alert("링크를 복사했어요."); }
+    } catch {}
+  });
+  window.addEventListener("popstate", () => {
+    const m = location.hash.match(/^#product=([\w-]+)/);
+    if (m) openSheet(m[1], false); else closeSheet(true);
+  });
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !sheet.hidden && !$("#order").open) closeSheet(); });
+  const initial = location.hash.match(/^#product=([\w-]+)/);
+  if (initial) openSheet(initial[1], false);
+
+  // 운명의 상대 맛보기
+  $("#sh-teaser-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    $("#sh-teaser-error").textContent = "";
+    if (!tf.ty.value || !tf.tm.value || !tf.td.value) { $("#sh-teaser-error").textContent = "생년월일을 모두 골라 주세요."; return; }
+    let solar = { year: Number(tf.ty.value), month: Number(tf.tm.value), day: Number(tf.td.value) };
+    let r, d;
+    try {
+      if (tf.tcal.value === "lunar") solar = window.Lunar.lunarToSolar(solar.year, solar.month, solar.day, false);
+      r = S.calculate({ ...solar, timeUnknown: true });
+      d = window.Destiny.build(r, S, tf.tg.value, new Date().getFullYear());
+    } catch (err) { $("#sh-teaser-error").textContent = err.message; return; }
+    const yearsHtml = d.years.length
+      ? d.years.map((y) => `<li><b>${y.year}년 ${esc(y.label)}</b> <small>${esc(y.reasons.join(" · "))}</small></li>`).join("")
+      : `<li>앞으로 5년 안에 뚜렷한 해는 없지만, 대운까지 보면 달라질 수 있어요. 본 풀이에서 10년 흐름으로 짚어 드려요.</li>`;
+    $("#sh-teaser-result").innerHTML = `
+      <div class="tz-row"><span>배우자 자리</span><b>${esc(d.palace)}</b></div>
+      <p>운명의 상대는 <b>${esc(d.mood)}</b> 같은 사람이에요. ${esc(d.look)}. ${esc(d.vibe)}</p>
+      <div class="tz-row"><span>배우자 별</span><b>${esc(d.star)}</b></div>
+      <p>${esc(d.starText)}</p>
+      <div class="tz-row"><span>인연이 오는 해</span></div>
+      <ul class="tz-years">${yearsHtml}</ul>
+      <div class="tz-locked">🔒 만나는 곳 · 그 사람의 일과 재물 · 잘 맞는 띠 · 연애 패턴 · 함께 사는 모습은 본 풀이에서 공개돼요</div>`;
+    $("#sh-teaser-result").hidden = false;
+    track("teaser-destiny");
+  });
 
   // ── 주문서 ──────────────────────────────────────────
   const dialog = $("#order");
