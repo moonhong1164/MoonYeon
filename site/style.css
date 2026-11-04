@@ -274,57 +274,61 @@ dialog::backdrop { background: #0f241bcc; }
   .pillars { gap: 6px; }
 }
 
-/* 이달의 운세 */
+/* 이달의 운세: 달력 한 장 */
 .month { margin-top: 18px; }
-.month-tabs { display: inline-flex; background: var(--bg-2); border-radius: 999px; padding: 4px; margin-bottom: 12px; }
-.month-tabs button { border: 0; background: none; font: inherit; font-size: .9rem; color: var(--ink-soft); padding: 6px 16px; border-radius: 999px; cursor: pointer; }
-.month-tabs button.on { background: var(--green); color: #fff; font-weight: 700; }
-.month-head { position: relative; overflow: hidden; text-align: center; border-radius: 22px; padding: 28px 20px 26px; color: #f5efe0;
-  background: radial-gradient(circle at 50% 22%, #2e6b5288 0, transparent 55%), linear-gradient(180deg, #173a2c, #0f241b); border: 1px solid #c9a43a55; }
-.month-orbit { width: 150px; height: 150px; display: block; margin: 0 auto 12px; }
-.month-orbit circle, .month-orbit path { fill: none; stroke: #f2d46b66; stroke-width: 1; }
-.month-orbit .sun { fill: #f2d46b; stroke: none; filter: drop-shadow(0 0 8px #f2d46b); }
-.month-orbit .dot { fill: #f2d46b; stroke: none; opacity: .85; }
-.month-eyebrow { margin: 0; font-size: .82rem; letter-spacing: .35em; font-weight: 700; color: var(--gold); }
-.month-title { font-family: var(--serif); font-weight: 700; font-size: clamp(1.25rem, 4.6vw, 1.7rem); line-height: 1.5; margin: 10px 0 8px; color: #fff; }
-.month-title em { font-style: normal; color: var(--gold); }
-.month-meta { margin: 0 0 14px; color: #c9d6cd; font-size: .92rem; }
-.month-meta b { color: var(--gold); }
-.month-chip { display: inline-block; border: 1px solid #f2d46b88; color: var(--gold); border-radius: 999px; padding: 6px 16px; font-size: .88rem; font-weight: 700; background: #f2d46b14; }
-.m-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; margin-top: 12px; }
-.m-card h4 { margin: 0 0 8px; font-size: 1.05rem; color: var(--green-deep); }
-.m-card p { margin: 0; line-height: 1.85; }
-.m-you { text-align: center; }
-.m-you h4 { color: var(--green-2); font-size: .92rem; }
-.m-overall { border-color: #e6c14f; background: #fffaea; }
-.m-money { border-left: 4px solid #c99a3d; }
-.m-love { border-left: 4px solid #e27b98; }
-.m-work { border-left: 4px solid #36508a; }
-.m-health { border-left: 4px solid #4f9a6a; }
-.luck { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.luck div { background: var(--bg); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; }
-.luck small { color: var(--ink-soft); font-size: .8rem; }
-.luck b { color: var(--green-deep); }
-.m-caution { border-color: #e9b3a8; background: #fff6f3; }
-.m-caution ul { margin: 0; padding-left: 18px; }
-.m-caution li { padding: 2px 0; }
-.m-caution li::marker { color: var(--fire); }
-.m-quote { text-align: center; background: #fffaea; border-color: #e6c14f; }
-.m-quote small { color: var(--gold-ink); opacity: .7; }
-.m-quote p { font-family: var(--serif); font-weight: 700; font-size: 1.15rem; color: var(--green-deep); margin-top: 4px; }
+.month-tabs { display: flex; gap: 6px; margin-bottom: -1px; padding-left: 10px; }
+.month-tabs button { border: 1px solid var(--line); border-bottom: 0; background: var(--bg-2); font: inherit; font-size: .88rem; color: var(--ink-soft); padding: 8px 16px; border-radius: 12px 12px 0 0; cursor: pointer; }
+.month-tabs button.on { background: var(--card); color: var(--green-deep); font-weight: 700; }
+.cal { position: relative; text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 6px 18px 18px 18px; padding: 30px 20px 24px; box-shadow: 0 10px 24px #1d2a2312; }
+.cal::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 12px; background: var(--green); border-radius: 6px 18px 0 0; }
+.cal-rings { position: absolute; top: -8px; left: 0; right: 0; display: flex; justify-content: center; gap: 120px; }
+.cal-rings i { width: 12px; height: 22px; border-radius: 6px; background: var(--bg); border: 2px solid #b9ae94; }
+.cal-top { display: flex; justify-content: space-between; font-size: .82rem; color: var(--ink-soft); margin-top: 4px; }
+.cal-gz { color: var(--green-2); font-weight: 700; }
+.cal-num { display: flex; align-items: baseline; justify-content: center; gap: 4px; line-height: 1; margin: 6px 0 4px; color: var(--green-deep); }
+.cal-num b { font-family: var(--serif); font-weight: 900; font-size: 4.6rem; letter-spacing: -0.04em; }
+.cal-num span { font-family: var(--serif); font-size: 1.4rem; color: var(--green-2); }
+.cal-title { font-family: var(--serif); font-weight: 700; font-size: clamp(1.1rem, 4.4vw, 1.35rem); margin: 6px 0 12px; color: var(--ink); }
+.cal-stamp { display: inline-block; font-family: var(--serif); font-weight: 900; font-size: 1.15rem; color: #b8432f; border: 2.5px solid #b8432f; border-radius: 4px; padding: 4px 14px; transform: rotate(-4deg); background: #fff8f2; }
+.cal-meta { margin: 14px 0 2px; font-size: .88rem; color: var(--ink-soft); }
+.cal-meta b { color: var(--green-deep); }
+.cal-key { margin: 0; font-size: .8rem; letter-spacing: .08em; color: var(--green-2); font-weight: 700; }
+.mo { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin-top: 12px; }
+.mo h4 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-family: var(--serif); font-size: 1.02rem; color: var(--green-deep); }
+.mo h4 i { font-style: normal; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 5px; background: var(--green); color: var(--gold); font-size: .82rem; }
+.mo p { margin: 0; line-height: 1.85; }
+.mo-you { background: transparent; border-style: dashed; }
+.mo-total { background-color: #fffdf7; background-image: repeating-linear-gradient(transparent 0 30px, #ece4d1 30px 31px); background-position: 0 44px; }
+.mo-total p { font-family: var(--serif); line-height: 31px; }
+.mo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.mo-grid .mo p { font-size: .93rem; line-height: 1.75; }
+.charms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.charms div { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 12px 6px 10px; background: #fff7e3; border: 1.5px solid #e2b9a0; border-radius: 4px; }
+.charms em { font-style: normal; font-family: var(--serif); font-weight: 900; color: #b8432f; font-size: 1.1rem; }
+.charms small { font-size: .7rem; color: var(--ink-soft); }
+.charms b { font-size: .86rem; color: var(--green-deep); line-height: 1.35; }
+.mo-warn ul { margin: 0; padding-left: 18px; }
+.mo-warn li { padding: 2px 0; }
+.mo-warn li::marker { color: #b8432f; }
+.mo-sign { margin-top: 16px; padding: 18px 10px 4px; text-align: center; border-top: 1px solid var(--line); }
+.mo-sign p { margin: 0; font-family: var(--serif); font-weight: 700; font-size: 1.2rem; color: var(--green-deep); }
+.mo-sign > span { display: block; margin-top: 6px; font-family: var(--serif); font-size: .85rem; color: var(--ink-soft); }
 
-/* 잠긴 평생 사주 */
-.locked { text-align: center; margin-top: 18px; border-radius: 22px; padding: 28px 20px; background: linear-gradient(180deg, #173a2c, #0f241b); color: #e8efe9; border: 1px solid #c9a43a55; }
-.locked-card { position: relative; width: 170px; height: 220px; margin: 0 auto 18px; border-radius: 16px; overflow: hidden; transform: rotate(-3deg); border: 1px solid #f2d46b88; box-shadow: 0 14px 30px #00000055; }
-.locked-blur { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; font-family: var(--serif); font-size: 2.2rem; color: #f2d46b; background: linear-gradient(160deg, #2e6b52, #173a2c); filter: blur(5px); }
-.locked-face { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; background: #0f241b66; }
-.locked-face .lock { font-size: 2.2rem; }
-.locked-face b { color: var(--gold); font-family: var(--serif); font-size: 1.1rem; }
-.locked-face small { color: #c9d6cd; }
-.locked h3 { font-family: var(--serif); font-size: 1.3rem; color: #fff; margin: 0 0 8px; }
-.locked p { color: #c9d6cd; line-height: 1.8; margin: 0 0 18px; }
-.locked p b { color: var(--gold); }
-.locked .more { display: block; margin-top: 12px; color: #c9d6cd; }
+/* 아직 열지 않은 편지 (평생 사주 안내) */
+.sealed { text-align: center; margin-top: 22px; padding: 26px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; }
+.envelope.small { width: 150px; height: 98px; margin: 0 auto 16px; }
+.envelope.small .env-flap { height: 56px; }
+.envelope.small .seal { top: 56px; width: 46px; height: 46px; }
+.envelope.small .seal span { font-size: 1.2rem; }
+.sealed h3 { font-family: var(--serif); font-size: 1.3rem; color: var(--green-deep); margin: 4px 0 8px; }
+.sealed p { color: var(--ink-soft); line-height: 1.8; margin: 0 0 18px; }
+.sealed p b { color: var(--green-deep); }
+.sealed .more { display: block; margin-top: 12px; }
+
+@media (max-width: 420px) {
+  .mo-grid { grid-template-columns: 1fr; }
+  .charms { grid-template-columns: 1fr 1fr; }
+}
 
 /* 상품 카드 버튼 */
 .product-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -357,10 +361,10 @@ body.locked-scroll { overflow: hidden; }
 .env-flap { position: absolute; left: 0; right: 0; top: 0; height: 86px; background: linear-gradient(180deg, #2a5f49, #224f3d);
   clip-path: polygon(0 0, 100% 0, 50% 100%); box-shadow: inset 0 -1px 0 #ffffff22; }
 .env-to { position: absolute; left: 14px; bottom: 12px; font-family: var(--serif); font-size: .72rem; letter-spacing: .12em; color: #f2d46baa; }
-.seal { position: absolute; left: 50%; top: 86px; transform: translate(-50%, -50%); width: 64px; height: 64px; display: grid; place-items: center;
+.envelope .seal { position: absolute; left: 50%; top: 86px; transform: translate(-50%, -50%); width: 64px; height: 64px; display: grid; place-items: center;
   border-radius: 46% 54% 50% 50% / 52% 48% 52% 48%; background: radial-gradient(circle at 35% 30%, #f6dd86, #d9b44a 60%, #b8902f);
   box-shadow: 0 4px 10px #00000044, inset 0 0 0 4px #e8c766, inset 0 0 0 5px #b8902f88; }
-.seal span { font-family: var(--serif); font-weight: 900; font-size: 1.7rem; color: var(--green-deep); }
+.envelope .seal span { font-family: var(--serif); font-weight: 900; font-size: 1.7rem; color: var(--green-deep); }
 .lt-kicker { margin: 0; font-size: .78rem; letter-spacing: .3em; color: var(--green-2); font-weight: 700; }
 .lt-hero h2 { font-family: var(--serif); font-weight: 900; font-size: clamp(1.9rem, 7vw, 2.4rem); margin: 6px 0 4px; color: var(--green-deep); letter-spacing: -0.02em; }
 .lt-sub { margin: 0 0 14px; font-family: var(--serif); color: var(--ink-soft); }

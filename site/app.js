@@ -162,11 +162,13 @@
     document.querySelectorAll(".month-tabs button").forEach((b) => b.classList.toggle("on", Number(b.dataset.offset) === offset));
     $("#tab-this").textContent = `${now.getMonth() + 1}월 · 이번 달`;
     $("#tab-next").textContent = `${((now.getMonth() + 1) % 12) + 1}월 · 다음 달`;
-    $("#m-eyebrow").textContent = `${y}년 ${mo}월 사주`;
+    $("#m-eyebrow").textContent = `${y}`;
+    $("#m-gz").textContent = `${m.pillarLabel}월 · ${m.pillarHanja}`;
+    $("#m-num").textContent = mo;
     $("#m-title").textContent = m.title;
     $("#m-theme").textContent = m.theme;
-    $("#m-meta").innerHTML = `${mo}월의 기운 <b>${esc(m.pillarLabel)}(${esc(m.pillarHanja)})</b> · 내 일간 <b>${esc(m.dmLabel)}</b>`;
-    $("#m-keyword").textContent = `이달의 키워드 · ${m.keyword}`;
+    $("#m-meta").innerHTML = `${mo}월의 기운 <b>${esc(m.pillarLabel)}</b>이 내 일간 <b>${esc(m.dmLabel)}</b>에게 오는 달`;
+    $("#m-keyword").textContent = m.keyword;
     document.querySelectorAll(".m-mon").forEach((el) => (el.textContent = `${mo}월`));
     $("#m-you").textContent = m.you;
     $("#m-overall").textContent = m.overall;
@@ -176,10 +178,10 @@
     $("#m-health").textContent = m.health;
     $("#m-color").textContent = m.luck.color;
     $("#m-dir").textContent = m.luck.dir;
-    $("#m-num").textContent = m.luck.num;
+    $("#m-num-luck").textContent = m.luck.num;
     $("#m-item").textContent = m.luck.item;
     $("#m-cautions").innerHTML = m.cautions.map((c) => `<li>${esc(c)}</li>`).join("");
-    $("#m-quote").textContent = `“${m.quote}”`;
+    $("#m-quote").textContent = m.quote;
     $("#m-note").textContent = `사주의 달은 절기로 바뀌어요. ${mo}월의 기운은 ${mo}월 초 절기(4~8일 무렵)부터 시작돼요.`;
   }
   document.querySelectorAll(".month-tabs button").forEach((b) =>
