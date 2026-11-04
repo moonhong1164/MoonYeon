@@ -4,7 +4,7 @@
   run <직원id> "<지시>"        직원에게 바로 일 맡기기
   ask "<지시>"                 비서실장이 나눠서 맡기기 (휴대폰 한 줄 지시와 같음)
   reading <상품> <생년월일> <시각|모름> <남|여> [이름] [질문]
-                               유료 풀이 초안 쓰기 (상품: life|love|money|newyear)
+                               유료 풀이 초안 쓰기 (상품: destiny|life|love|money|newyear)
   chart <생년월일> <시각|모름> <남|여> [이름]
                                풀이용 사주 자료만 보기
   due                          지금 시각에 출근할 루틴 보기
@@ -29,7 +29,7 @@ def _print_results(results: list[employee.Result]) -> None:
         print(f"\n(저장: {r.output_path})\n")
 
 
-PRODUCTS = {"life": "평생 사주 정밀 풀이", "love": "연애·궁합 풀이", "money": "재물·직업운 풀이", "newyear": "신년운세"}
+PRODUCTS = {"destiny": "운명의 상대", "life": "평생 사주 정밀 풀이", "love": "연애·궁합 풀이", "money": "재물·직업운 풀이", "newyear": "신년운세"}
 
 
 def saju_chart(birth: str, time: str, gender: str, name: str = "") -> str:

@@ -48,6 +48,50 @@
   document.title = SHOP.name;
   if (SHOP.hours) $("#hours-text").textContent = SHOP.hours;
 
+  // ── 안내자(캐릭터) ─────────────────────────────────
+  const GUIDES = SHOP.guides || [];
+  let guide = null;
+  $("#guide-list").innerHTML = GUIDES.map((g) => `
+    <article class="guide" data-guide="${esc(g.id)}">
+      <div class="guide-art">
+        ${g.image ? `<img src="${esc(g.image)}" alt="${esc(g.name)}" loading="lazy">` : `<div class="guide-ph" aria-hidden="true"><span class="ph-ring"></span><span class="ph-hanja">${esc(g.hanja)}</span><span class="ph-brand">月緣</span></div>`}
+        <div class="guide-info">
+          <h3>${esc(g.name)}</h3>
+          <p>${esc(g.line)}</p>
+          <button type="button" class="btn btn-gold small-btn" data-pick="${esc(g.id)}">${esc(g.name)}${josa(g.name, "과", "와")} 사주 보기</button>
+        </div>
+      </div>
+    </article>`).join("");
+  function pickGuide(id) {
+    guide = GUIDES.find((g) => g.id === id) || null;
+    document.querySelectorAll(".guide").forEach((el) => el.classList.toggle("picked", guide && el.dataset.guide === guide.id));
+    if (guide) {
+      $("#avatar").textContent = guide.hanja;
+      $("#submit-btn").textContent = `${guide.name}에게 내 사주 보여 주기`;
+    }
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pick]");
+    if (!b) return;
+    pickGuide(b.dataset.pick);
+    track(`guide-${b.dataset.pick}`);
+    $("#free").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // ── 후기 (실제 후기만) ─────────────────────────────
+  const REVIEWS = SHOP.reviews || [];
+  if (REVIEWS.length) {
+    const ANIMAL_HANJA = { 쥐: "子", 소: "丑", 호랑이: "寅", 토끼: "卯", 용: "辰", 뱀: "巳", 말: "午", 양: "未", 원숭이: "申", 닭: "酉", 개: "戌", 돼지: "亥" };
+    $("#story-list").innerHTML = REVIEWS.map((v) => `
+      <article class="story">
+        <header><span class="story-badge">${esc(ANIMAL_HANJA[v.animal] || "月")}</span>
+          <div><b>${esc(v.name)}</b><small>${esc(v.animal ? v.animal + "띠 · " : "")}${esc(v.product || "")}</small></div>
+          <time>${esc(v.date || "")}</time></header>
+        <p>${esc(v.text)}</p>
+      </article>`).join("");
+    $("#stories").hidden = false;
+  }
+
   // ── 무료 사주 ────────────────────────────────────────
   const form = $("#saju-form");
   const f = form.elements;
@@ -107,6 +151,44 @@
     track(isLunar() ? "free-saju-lunar" : "free-saju");
   });
 
+  // ── 이달의 운세 ─────────────────────────────────────
+  let monthState = null;
+  function renderMonth(offset) {
+    if (!monthState || !window.Monthly) return;
+    const now = new Date();
+    const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+    const y = base.getFullYear(), mo = base.getMonth() + 1;
+    const m = window.Monthly.build(monthState.r, S, y, mo, monthState.name);
+    document.querySelectorAll(".month-tabs button").forEach((b) => b.classList.toggle("on", Number(b.dataset.offset) === offset));
+    $("#tab-this").textContent = `${now.getMonth() + 1}월 · 이번 달`;
+    $("#tab-next").textContent = `${((now.getMonth() + 1) % 12) + 1}월 · 다음 달`;
+    $("#m-eyebrow").textContent = `${y}년 ${mo}월 사주`;
+    $("#m-title").textContent = m.title;
+    $("#m-theme").textContent = m.theme;
+    $("#m-meta").innerHTML = `${mo}월의 기운 <b>${esc(m.pillarLabel)}(${esc(m.pillarHanja)})</b> · 내 일간 <b>${esc(m.dmLabel)}</b>`;
+    $("#m-keyword").textContent = `이달의 키워드 · ${m.keyword}`;
+    document.querySelectorAll(".m-mon").forEach((el) => (el.textContent = `${mo}월`));
+    $("#m-you").textContent = m.you;
+    $("#m-overall").textContent = m.overall;
+    $("#m-money").textContent = m.money;
+    $("#m-love").textContent = m.love;
+    $("#m-work").textContent = m.work;
+    $("#m-health").textContent = m.health;
+    $("#m-color").textContent = m.luck.color;
+    $("#m-dir").textContent = m.luck.dir;
+    $("#m-num").textContent = m.luck.num;
+    $("#m-item").textContent = m.luck.item;
+    $("#m-cautions").innerHTML = m.cautions.map((c) => `<li>${esc(c)}</li>`).join("");
+    $("#m-quote").textContent = `“${m.quote}”`;
+    $("#m-note").textContent = `사주의 달은 절기로 바뀌어요. ${mo}월의 기운은 ${mo}월 초 절기(4~8일 무렵)부터 시작돼요.`;
+  }
+  document.querySelectorAll(".month-tabs button").forEach((b) =>
+    b.addEventListener("click", () => {
+      renderMonth(Number(b.dataset.offset));
+      track(Number(b.dataset.offset) ? "month-next" : "month-this");
+    })
+  );
+
   function glyph(p, which) {
     if (!p) return `<div class="glyph unknown"><span class="h">？</span><span class="k">모름</span></div>`;
     const e = which === "stem" ? S.STEM_ELEMENT[p.stem] : S.BRANCH_ELEMENT[p.branch];
@@ -119,7 +201,8 @@
     const reading = R.build(r, S);
     const who = name ? `${esc(name)}님` : "당신";
     const dmWord = S.STEMS[r.dayMaster] + S.ELEMENTS[r.dayMasterElement];
-    $("#greet").innerHTML = `${who}의 사주를 펼쳐 봤어요. ${r.input.year}년생 <b>${r.animal}띠</b>(${S.label(r.pillars.year)}년)이고, 나를 나타내는 일간은 <b>${dmWord}</b>${josa(dmWord, "이에요", "예요")}.`;
+    const voice = guide ? `${esc(guide.name)}${josa(guide.name, "이", "가")} ` : "";
+    $("#greet").innerHTML = `${voice}${who}의 사주를 펼쳐 봤어요. ${r.input.year}년생 <b>${r.animal}띠</b>(${S.label(r.pillars.year)}년)이고, 나를 나타내는 일간은 <b>${dmWord}</b>${josa(dmWord, "이에요", "예요")}.`;
 
     const cols = [
       ["시", r.pillars.hour, r.hourName || "시 모름"],
@@ -165,6 +248,9 @@
     $("#year-title").textContent = `${reading.year.label} 기운`;
     $("#year-text").textContent = reading.year.text;
 
+    monthState = { r, name };
+    renderMonth(0);
+
     $("#result").hidden = false;
     $("#result").scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -178,9 +264,144 @@
         <div class="price">${won(p.price)} <small>/ 1회</small></div>
         <p>${esc(p.desc)}</p>
         <ul>${p.includes.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
-        <button class="btn btn-main" data-order="${esc(p.id)}">이 풀이 주문하기</button>
+        <div class="product-actions">
+          <button class="btn btn-main" data-detail="${esc(p.id)}">자세히 보기</button>
+          <button class="btn" data-order="${esc(p.id)}">바로 주문</button>
+        </div>
       </article>`)
-    .join("");
+    .join("") +
+    (SHOP.partners || [])
+      .filter((p) => /^https:\/\//.test(p.url || ""))
+      .map((p) => `
+      <article class="product partner">
+        <span class="badge partner-badge">제휴</span>
+        <h3>${esc(p.name)}</h3>
+        <p class="partner-sub">${esc(p.subtitle || "")}</p>
+        <p>${esc(p.desc)}</p>
+        <p class="partner-note">외부 제휴 서비스로 연결돼요. 가격·결제·환불은 제휴사 정책을 따라요.</p>
+        <div class="product-actions">
+          <a class="btn btn-main" href="${esc(p.url)}" target="_blank" rel="noopener sponsored" data-partner="${esc(p.id)}">제휴 페이지에서 보기 ↗</a>
+        </div>
+      </article>`)
+      .join("");
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-partner]");
+    if (a) track(`partner-${a.dataset.partner}`);
+  });
+
+  // ── 상품 상세 페이지 ───────────────────────────────
+  const sheet = $("#sheet");
+  let sheetProduct = null;
+  let sheetPushed = false; // 사이트 안에서 열었으면 true → 닫을 때 뒤로 가기, 링크로 바로 들어왔으면 주소만 정리
+  const tf = $("#sh-teaser-form").elements;
+  (function fillTeaserSelects() {
+    const yNow = new Date().getFullYear();
+    const o = (v, t, sel) => `<option value="${v}"${sel ? " selected" : ""}>${t}</option>`;
+    tf.ty.innerHTML = o("", "년", true) + Array.from({ length: yNow - 1901 + 1 }, (_, i) => yNow - i).map((y) => o(y, `${y}년`)).join("");
+    tf.tm.innerHTML = o("", "월", true) + Array.from({ length: 12 }, (_, i) => o(i + 1, `${i + 1}월`)).join("");
+    tf.td.innerHTML = o("", "일", true) + Array.from({ length: 31 }, (_, i) => o(i + 1, `${i + 1}일`)).join("");
+  })();
+
+  function openSheet(id, push = true) {
+    const p = SHOP.products.find((x) => x.id === id);
+    if (!p) return;
+    sheetProduct = p;
+    $("#sheet-bar-title").textContent = p.name;
+    $("#sh-emblem").textContent = p.emblem || "月";
+    $("#sh-title").textContent = p.name;
+    $("#sh-sub").textContent = p.subtitle || "";
+    const n = (p.chapters || []).length;
+    $("#sh-chips").innerHTML = [n ? `📖 ${n}장 풀이` : "", "💬 카톡으로 받기", "🗂️ 평생 소장"].filter(Boolean).map((c) => `<span>${c}</span>`).join("");
+    $("#sh-price").innerHTML = `${won(p.price)} <small>${n ? `${n}장 리포트` : ""}</small>`;
+    $("#sh-delivery").textContent = SHOP.delivery || "";
+    $("#sh-toc-title").textContent = `${p.name}${n ? ` · ${n}장` : ""}`;
+    $("#sh-toc").innerHTML = (p.chapters || []).map(([t, d], i) => `<li><span class="n">${i + 1}</span><div><b>${esc(t)}</b><small>${esc(d)}</small></div></li>`).join("");
+    const sm = p.sample || {};
+    $("#sh-sample-tag").textContent = sm.chapter || p.name;
+    $("#sh-sample-text").textContent = sm.text || p.desc;
+    $("#sh-sample-hidden").textContent = sm.hidden || "";
+    $("#sh-rec").innerHTML = (p.recommend || []).map((r) => `<li>${r}</li>`).join("");
+    $("#sh-teaser-box").hidden = p.teaser !== "destiny";
+    $("#sh-teaser-result").hidden = true;
+    $("#sh-buy-name").textContent = p.name;
+    $("#sh-buy-price").textContent = won(p.price);
+    if (last && last.result && p.teaser === "destiny") {
+      tf.ty.value = last.result.input.year; tf.tm.value = last.result.input.month; tf.td.value = last.result.input.day;
+      tf.tg.value = last.gender;
+    }
+    sheet.hidden = false;
+    document.body.classList.add("locked-scroll");
+    sheet.querySelector(".sheet-body").scrollTop = 0;
+    if (push && location.hash !== `#product=${id}`) { history.pushState(null, "", `#product=${id}`); sheetPushed = true; }
+    track(`detail-${id}`);
+  }
+  function closeSheet(fromHistory = false) {
+    if (sheet.hidden) return;
+    sheet.hidden = true;
+    document.body.classList.remove("locked-scroll");
+    if (!fromHistory && location.hash.startsWith("#product=")) {
+      if (sheetPushed) history.back();
+      else history.replaceState(null, "", location.pathname + location.search);
+    }
+    sheetPushed = false;
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-detail]");
+    if (b) openSheet(b.dataset.detail);
+  });
+  $("#sheet-close").addEventListener("click", () => closeSheet());
+  $("#sh-refund").addEventListener("click", () => closeSheet());
+  $("#sh-buy").addEventListener("click", () => {
+    const id = sheetProduct.id;
+    const btn = document.createElement("button");
+    btn.dataset.order = id;
+    btn.hidden = true;
+    document.body.appendChild(btn);
+    btn.click();
+    btn.remove();
+  });
+  $("#sheet-share").addEventListener("click", async () => {
+    const url = `${location.origin}${location.pathname}#product=${sheetProduct.id}`;
+    const data = { title: `${SHOP.name} · ${sheetProduct.name}`, text: sheetProduct.subtitle || "", url };
+    try {
+      if (navigator.share) await navigator.share(data);
+      else { await navigator.clipboard.writeText(url); alert("링크를 복사했어요."); }
+    } catch {}
+  });
+  window.addEventListener("popstate", () => {
+    const m = location.hash.match(/^#product=([\w-]+)/);
+    if (m) openSheet(m[1], false); else closeSheet(true);
+  });
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && !sheet.hidden && !$("#order").open) closeSheet(); });
+  const initial = location.hash.match(/^#product=([\w-]+)/);
+  if (initial) openSheet(initial[1], false);
+
+  // 운명의 상대 맛보기
+  $("#sh-teaser-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    $("#sh-teaser-error").textContent = "";
+    if (!tf.ty.value || !tf.tm.value || !tf.td.value) { $("#sh-teaser-error").textContent = "생년월일을 모두 골라 주세요."; return; }
+    let solar = { year: Number(tf.ty.value), month: Number(tf.tm.value), day: Number(tf.td.value) };
+    let r, d;
+    try {
+      if (tf.tcal.value === "lunar") solar = window.Lunar.lunarToSolar(solar.year, solar.month, solar.day, false);
+      r = S.calculate({ ...solar, timeUnknown: true });
+      d = window.Destiny.build(r, S, tf.tg.value, new Date().getFullYear());
+    } catch (err) { $("#sh-teaser-error").textContent = err.message; return; }
+    const yearsHtml = d.years.length
+      ? d.years.map((y) => `<li><b>${y.year}년 ${esc(y.label)}</b> <small>${esc(y.reasons.join(" · "))}</small></li>`).join("")
+      : `<li>앞으로 5년 안에 뚜렷한 해는 없지만, 대운까지 보면 달라질 수 있어요. 본 풀이에서 10년 흐름으로 짚어 드려요.</li>`;
+    $("#sh-teaser-result").innerHTML = `
+      <div class="tz-row"><span>배우자 자리</span><b>${esc(d.palace)}</b></div>
+      <p>운명의 상대는 <b>${esc(d.mood)}</b> 같은 사람이에요. ${esc(d.look)}. ${esc(d.vibe)}</p>
+      <div class="tz-row"><span>배우자 별</span><b>${esc(d.star)}</b></div>
+      <p>${esc(d.starText)}</p>
+      <div class="tz-row"><span>인연이 오는 해</span></div>
+      <ul class="tz-years">${yearsHtml}</ul>
+      <div class="tz-locked">🔒 만나는 곳 · 그 사람의 일과 재물 · 잘 맞는 띠 · 연애 패턴 · 함께 사는 모습은 본 풀이에서 공개돼요</div>`;
+    $("#sh-teaser-result").hidden = false;
+    track("teaser-destiny");
+  });
 
   // ── 주문서 ──────────────────────────────────────────
   const dialog = $("#order");
@@ -276,11 +497,11 @@
     const serif = '"Noto Serif KR", serif', sans = '"Noto Sans KR", sans-serif';
 
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#17153a");
-    g.addColorStop(1, "#2a2462");
+    g.addColorStop(0, "#f8f4ea");
+    g.addColorStop(1, "#eee6d2");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#ffffff55";
+    ctx.fillStyle = "#1f4d3a33";
     [[120, 160, 2], [930, 120, 3], [820, 300, 2], [160, 520, 2], [980, 620, 2], [70, 980, 3]].forEach(([x, y, rad]) => {
       ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fill();
     });
@@ -290,15 +511,15 @@
     moon.addColorStop(0, "#fffbea"); moon.addColorStop(1, "#e9c46a");
     ctx.fillStyle = moon;
     ctx.beginPath(); ctx.arc(W / 2, 210, 100, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#17153a";
+    ctx.fillStyle = "#173a2c";
     ctx.textAlign = "center";
     ctx.font = `900 64px ${serif}`;
     ctx.fillText("월연", W / 2, 232);
 
-    ctx.fillStyle = "#c9c5e6";
+    ctx.fillStyle = "#5d6b63";
     ctx.font = `500 34px ${sans}`;
     ctx.fillText(`${last.name ? last.name + "님" : "나"}의 사주 · ${r.animal}띠`, W / 2, 380);
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#173a2c";
     ctx.font = `900 50px ${serif}`;
     ctx.fillText(reading.dayMaster.title, W / 2, 452);
 
@@ -308,11 +529,11 @@
     const bw = 190, bh = 150, gap = 22, x0 = (W - (bw * 4 + gap * 3)) / 2, y0 = 530;
     cols.forEach((p, i) => {
       const x = x0 + i * (bw + gap);
-      ctx.fillStyle = "#b6b1d8"; ctx.font = `500 28px ${sans}`;
+      ctx.fillStyle = "#7a857e"; ctx.font = `500 28px ${sans}`;
       ctx.fillText(heads[i] + "주", x + bw / 2, y0 - 16);
       [["stem", 0], ["branch", 1]].forEach(([which, row]) => {
         const y = y0 + row * (bh + 16);
-        let color = "#3a3566", hanja = "?", kor = "모름";
+        let color = "#d9d1bd", hanja = "?", kor = "모름";
         if (p) {
           const e = which === "stem" ? S.STEM_ELEMENT[p.stem] : S.BRANCH_ELEMENT[p.branch];
           color = ELEMENT_COLORS[e];
@@ -320,7 +541,7 @@
           kor = (which === "stem" ? S.STEMS[p.stem] : S.BRANCHES[p.branch]) + " · " + S.ELEMENTS[e];
         }
         ctx.fillStyle = color; rrect(ctx, x, y, bw, bh, 22); ctx.fill();
-        if (i === 1 && row === 0) { ctx.strokeStyle = "#f3d27a"; ctx.lineWidth = 6; rrect(ctx, x - 6, y - 6, bw + 12, bh + 12, 26); ctx.stroke(); }
+        if (i === 1 && row === 0) { ctx.strokeStyle = "#173a2c"; ctx.lineWidth = 6; rrect(ctx, x - 6, y - 6, bw + 12, bh + 12, 26); ctx.stroke(); }
         ctx.fillStyle = "#ffffff";
         ctx.font = `700 80px ${serif}`; ctx.fillText(hanja, x + bw / 2, y + 92);
         ctx.font = `500 26px ${sans}`; ctx.fillText(kor, x + bw / 2, y + 132);
@@ -332,18 +553,18 @@
     const by0 = 900, barX = 250, barW = 640;
     r.counts.forEach((n, i) => {
       const y = by0 + i * 52;
-      ctx.textAlign = "left"; ctx.fillStyle = "#e3e0f5"; ctx.font = `500 30px ${sans}`;
+      ctx.textAlign = "left"; ctx.fillStyle = "#3d4a43"; ctx.font = `500 30px ${sans}`;
       ctx.fillText(`${S.ELEMENTS[i]}(${S.ELEMENTS_HANJA[i]})`, 150, y + 26);
-      ctx.fillStyle = "#ffffff1f"; rrect(ctx, barX, y + 6, barW, 24, 12); ctx.fill();
+      ctx.fillStyle = "#1f4d3a1a"; rrect(ctx, barX, y + 6, barW, 24, 12); ctx.fill();
       if (n) { ctx.fillStyle = ELEMENT_COLORS[i]; rrect(ctx, barX, y + 6, Math.max(24, (barW * n) / total), 24, 12); ctx.fill(); }
-      ctx.textAlign = "right"; ctx.fillStyle = "#ffffff"; ctx.fillText(String(n), 940, y + 28);
+      ctx.textAlign = "right"; ctx.fillStyle = "#173a2c"; ctx.fillText(String(n), 940, y + 28);
     });
 
     // 한 줄 + 주소
     ctx.textAlign = "center";
-    ctx.fillStyle = "#f3d27a"; ctx.font = `700 32px ${sans}`;
+    ctx.fillStyle = "#2e6b52"; ctx.font = `700 32px ${sans}`;
     ctx.fillText(`타고난 강점 · ${reading.dayMaster.good}`, W / 2, 1210);
-    ctx.fillStyle = "#9d98c4"; ctx.font = `500 26px ${sans}`;
+    ctx.fillStyle = "#8a948d"; ctx.font = `500 26px ${sans}`;
     ctx.fillText(`${SHOP.name} · ${siteUrl().replace(/^https?:\/\//, "")}`, W / 2, 1290);
     return c;
   }
