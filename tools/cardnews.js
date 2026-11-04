@@ -29,31 +29,25 @@ const ZODIAC = [
 
 const CSS = `
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { width: 1080px; height: 1350px; overflow: hidden; font-family: "Noto Sans KR", sans-serif; color: #fff;
-  background:
-    radial-gradient(2px 2px at 9% 12%, #fff9 50%, transparent 51%),
-    radial-gradient(2px 2px at 88% 9%, #fffc 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 76% 30%, #fff8 50%, transparent 51%),
-    radial-gradient(2px 2px at 14% 58%, #fff7 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 92% 66%, #fff9 50%, transparent 51%),
-    radial-gradient(2px 2px at 6% 88%, #fff8 50%, transparent 51%),
-    linear-gradient(180deg, #17153a 0%, #2a2462 100%); }
-.frame { position: absolute; inset: 40px; border: 2px solid #f3d27a55; border-radius: 36px; }
-.top { position: absolute; top: 84px; left: 0; right: 0; text-align: center; font-weight: 700; letter-spacing: .2em; color: #f3d27a; font-size: 28px; }
-.foot { position: absolute; bottom: 82px; left: 90px; right: 90px; display: flex; justify-content: space-between; color: #9d98c4; font-size: 26px; }
-.foot b { color: #f3d27a; font-weight: 700; }
+body { width: 1080px; height: 1350px; overflow: hidden; font-family: "Noto Sans KR", sans-serif; color: #173a2c;
+  background: radial-gradient(#1f4d3a12 1.5px, transparent 1.5px) 0 0 / 9px 9px, linear-gradient(180deg, #f8f4ea 0%, #efe7d3 100%); }
+.frame { position: absolute; inset: 40px; border: 3px solid #1f4d3a; border-radius: 10px; }
+.frame::after { content: ""; position: absolute; inset: 10px; border: 1.5px solid #c9a43a; border-radius: 6px; }
+.top { position: absolute; top: 92px; left: 0; right: 0; text-align: center; font-weight: 700; letter-spacing: .3em; color: #2e6b52; font-size: 26px; }
+.foot { position: absolute; bottom: 84px; left: 96px; right: 96px; display: flex; justify-content: space-between; color: #7a857e; font-size: 26px; font-family: "Noto Serif KR", serif; }
+.foot b { color: #b8432f; font-weight: 700; }
 .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 110px; }
-.moon { width: 300px; height: 300px; border-radius: 50%; display: grid; place-items: center;
-  background: radial-gradient(circle at 38% 34%, #fffbea 0%, #f9e6a8 45%, #e9c46a 100%);
-  box-shadow: 0 0 80px #f3d27a66, 0 0 160px #f3d27a2a; color: #17153a; font-family: "Noto Serif KR", serif; font-weight: 900; }
-.serif { font-family: "Noto Serif KR", serif; font-weight: 900; letter-spacing: -0.02em; }
+.moon { width: 300px; height: 300px; border-radius: 47% 53% 50% 50% / 52% 48% 52% 48%; display: grid; place-items: center;
+  background: radial-gradient(circle at 36% 30%, #f8e29a 0%, #e2bf55 55%, #b8902f 100%);
+  box-shadow: 0 14px 30px #1d2a2333, inset 0 0 0 10px #e9c766, inset 0 0 0 12px #b8902f99; color: #173a2c; font-family: "Noto Serif KR", serif; font-weight: 900; }
+.serif { font-family: "Noto Serif KR", serif; font-weight: 900; letter-spacing: -0.02em; color: #173a2c; }
 .name { font-size: 72px; margin-top: 54px; }
-.years { color: #b6b1d8; font-size: 30px; margin-top: 14px; letter-spacing: .04em; }
+.years { color: #5d6b63; font-size: 30px; margin-top: 14px; letter-spacing: .04em; }
 .line { font-size: 84px; line-height: 1.28; margin-top: 56px; white-space: pre-line; }
 .tags { display: flex; gap: 16px; margin-top: 52px; }
-.tag { border: 2px solid #f3d27a88; color: #f3d27a; border-radius: 999px; padding: 10px 28px; font-size: 32px; font-weight: 700; }
-.months { margin-top: 34px; font-size: 34px; color: #e3e0f5; }
-.months b { color: #f3d27a; }
+.tag { border: 2.5px solid #b8432f; color: #b8432f; border-radius: 6px; padding: 8px 26px; font-size: 32px; font-weight: 700; font-family: "Noto Serif KR", serif; background: #fff8f2; }
+.months { margin-top: 34px; font-size: 34px; color: #3d4a43; }
+.months b { color: #1f4d3a; }
 `;
 
 const page = (inner, n, total) => `<!doctype html><html><head><meta charset="utf-8">
@@ -66,8 +60,8 @@ const zodiacSlides = (T) => [
     <div class="center">
       <div class="moon" style="font-size:150px">未</div>
       <div class="serif" style="font-size:96px;line-height:1.25;margin-top:70px">2027<br>붉은 양의 해</div>
-      <div style="font-size:48px;font-weight:700;margin-top:34px;color:#f3d27a">내 띠 한 줄 운세 🌙</div>
-      <div style="font-size:30px;margin-top:40px;color:#b6b1d8">저장해 두고 내년에 꺼내 보기</div>
+      <div style="font-size:48px;font-weight:700;margin-top:34px;color:#2e6b52">내 띠 한 줄 운세 🌙</div>
+      <div style="font-size:30px;margin-top:40px;color:#5d6b63">저장해 두고 내년에 꺼내 보기</div>
     </div>`, 1, T),
   ...ZODIAC.map((z, i) =>
     page(`<div class="top">2027 띠별 운세</div>
@@ -83,9 +77,9 @@ const zodiacSlides = (T) => [
   page(`<div class="top">MOONYEON</div>
     <div class="center">
       <div class="serif" style="font-size:80px;line-height:1.3">띠는<br>맛보기일 뿐 🌙</div>
-      <div style="font-size:44px;line-height:1.6;margin-top:56px;color:#e3e0f5">내 사주 여덟 글자는<br><b style="color:#f3d27a">무료로</b> 볼 수 있어요</div>
-      <div style="margin-top:56px;background:#5a4fcf;border-radius:999px;padding:24px 56px;font-size:40px;font-weight:700;box-shadow:0 10px 30px #5a4fcf66">프로필 링크에서 확인하기</div>
-      <div style="font-size:28px;margin-top:48px;color:#9d98c4;line-height:1.6">음력 생일도 OK · 회원가입 없음<br>띠는 입춘 기준 · 재미로 봐 주세요</div>
+      <div style="font-size:44px;line-height:1.6;margin-top:56px;color:#3d4a43">내 사주 여덟 글자는<br><b style="color:#2e6b52">무료로</b> 볼 수 있어요</div>
+      <div style="margin-top:56px;background:#1f4d3a;color:#f2d46b;border-radius:14px;padding:24px 56px;font-size:40px;font-weight:700;box-shadow:0 10px 24px #1f4d3a40">프로필 링크에서 확인하기</div>
+      <div style="font-size:28px;margin-top:48px;color:#7a857e;line-height:1.6">음력 생일도 OK · 회원가입 없음<br>띠는 입춘 기준 · 재미로 봐 주세요</div>
     </div>`, 14, T),
 ];
 
@@ -106,10 +100,10 @@ const EL_COLOR = { "木": "#4f9a6a", "火": "#e2604c", "土": "#c99a3d", "金": 
 const daymasterSlides = (T) => [
   page(`<div class="top">MOONYEON</div>
     <div class="center">
-      <div style="display:flex;gap:18px">${["木", "火", "土", "金", "水"].map((e) => `<div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:${EL_COLOR[e]};font-family:'Noto Serif KR',serif;font-weight:900;font-size:60px">${e}</div>`).join("")}</div>
+      <div style="display:flex;gap:18px">${["木", "火", "土", "金", "水"].map((e) => `<div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:${EL_COLOR[e]};font-family:'Noto Serif KR',serif;font-weight:900;font-size:60px;color:#fff">${e}</div>`).join("")}</div>
       <div class="serif" style="font-size:88px;line-height:1.3;margin-top:80px">나를 나타내는<br>글자 10가지</div>
-      <div style="font-size:42px;font-weight:700;margin-top:36px;color:#f3d27a">사주 속 '진짜 나', 일간 🌙</div>
-      <div style="font-size:30px;margin-top:40px;color:#b6b1d8;line-height:1.6">띠가 아니라 <b style="color:#fff">태어난 날</b>에 있어요<br>내 글자를 찾아 저장해 두세요</div>
+      <div style="font-size:42px;font-weight:700;margin-top:36px;color:#2e6b52">사주 속 '진짜 나', 일간 🌙</div>
+      <div style="font-size:30px;margin-top:40px;color:#5d6b63;line-height:1.6">띠가 아니라 <b style="color:#173a2c">태어난 날</b>에 있어요<br>내 글자를 찾아 저장해 두세요</div>
     </div>`, 1, T),
   ...DAYMASTER.map((d, i) =>
     page(`<div class="top">일간 ${i + 1} / 10</div>
@@ -117,22 +111,22 @@ const daymasterSlides = (T) => [
         <div class="moon" style="width:240px;height:240px;font-size:136px">${d.hanja}</div>
         <div style="margin-top:44px;display:flex;align-items:center;gap:16px">
           <span class="serif" style="font-size:60px">${d.name}</span>
-          <span style="background:${EL_COLOR[d.el]};border-radius:999px;padding:6px 22px;font-size:30px;font-weight:700">${d.el}</span>
+          <span style="background:${EL_COLOR[d.el]};border-radius:999px;padding:6px 22px;font-size:30px;font-weight:700;color:#fff">${d.el}</span>
         </div>
         <div class="serif line" style="font-size:80px;margin-top:40px">${d.title}</div>
-        <div style="font-size:36px;line-height:1.5;margin-top:36px;color:#e3e0f5;white-space:pre-line">${d.line}</div>
+        <div style="font-size:36px;line-height:1.5;margin-top:36px;color:#3d4a43;white-space:pre-line">${d.line}</div>
         <div style="margin-top:44px;font-size:32px;line-height:1.8">
-          <div><span style="color:#f3d27a;font-weight:700">강점</span> &nbsp;${d.good}</div>
-          <div><span style="color:#f3d27a;font-weight:700">한마디</span> &nbsp;${d.tip}</div>
+          <div><span style="color:#2e6b52;font-weight:700">강점</span> &nbsp;${d.good}</div>
+          <div><span style="color:#2e6b52;font-weight:700">한마디</span> &nbsp;${d.tip}</div>
         </div>
       </div>`, i + 2, T)
   ),
   page(`<div class="top">MOONYEON</div>
     <div class="center">
       <div class="serif" style="font-size:80px;line-height:1.3">내 일간은<br>뭘까? 🌙</div>
-      <div style="font-size:44px;line-height:1.6;margin-top:56px;color:#e3e0f5">생년월일만 넣으면<br><b style="color:#f3d27a">무료로</b> 바로 알려 드려요</div>
-      <div style="margin-top:56px;background:#5a4fcf;border-radius:999px;padding:24px 56px;font-size:40px;font-weight:700;box-shadow:0 10px 30px #5a4fcf66">프로필 링크에서 확인하기</div>
-      <div style="font-size:28px;margin-top:48px;color:#9d98c4;line-height:1.6">음력 생일도 OK · 회원가입 없음<br>재미로 봐 주세요</div>
+      <div style="font-size:44px;line-height:1.6;margin-top:56px;color:#3d4a43">생년월일만 넣으면<br><b style="color:#2e6b52">무료로</b> 바로 알려 드려요</div>
+      <div style="margin-top:56px;background:#1f4d3a;color:#f2d46b;border-radius:14px;padding:24px 56px;font-size:40px;font-weight:700;box-shadow:0 10px 24px #1f4d3a40">프로필 링크에서 확인하기</div>
+      <div style="font-size:28px;margin-top:48px;color:#7a857e;line-height:1.6">음력 생일도 OK · 회원가입 없음<br>재미로 봐 주세요</div>
     </div>`, T, T),
 ];
 
