@@ -269,7 +269,25 @@
           <button class="btn" data-order="${esc(p.id)}">바로 주문</button>
         </div>
       </article>`)
-    .join("");
+    .join("") +
+    (SHOP.partners || [])
+      .filter((p) => /^https:\/\//.test(p.url || ""))
+      .map((p) => `
+      <article class="product partner">
+        <span class="badge partner-badge">제휴</span>
+        <h3>${esc(p.name)}</h3>
+        <p class="partner-sub">${esc(p.subtitle || "")}</p>
+        <p>${esc(p.desc)}</p>
+        <p class="partner-note">외부 제휴 서비스로 연결돼요. 가격·결제·환불은 제휴사 정책을 따라요.</p>
+        <div class="product-actions">
+          <a class="btn btn-main" href="${esc(p.url)}" target="_blank" rel="noopener sponsored" data-partner="${esc(p.id)}">제휴 페이지에서 보기 ↗</a>
+        </div>
+      </article>`)
+      .join("");
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-partner]");
+    if (a) track(`partner-${a.dataset.partner}`);
+  });
 
   // ── 상품 상세 페이지 ───────────────────────────────
   const sheet = $("#sheet");

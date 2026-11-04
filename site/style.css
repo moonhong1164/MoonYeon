@@ -401,3 +401,10 @@ body.locked-scroll { overflow: hidden; }
 .sh-buy small { color: #a9a0cc; font-size: .8rem; }
 .sh-buy b { color: #fff; font-size: 1.15rem; }
 .sh-buy .btn { flex: 1; justify-content: center; padding: 14px; font-size: 1.02rem; }
+
+/* 제휴 상품 */
+.product.partner { border: 1px dashed #c9a43a; background: #fffdf4; }
+.partner-badge { background: var(--green-deep) !important; color: var(--gold) !important; }
+.partner-sub { margin: 2px 0 6px; color: var(--green-2); font-weight: 700; }
+.partner-note { font-size: .82rem; color: var(--ink-soft); background: var(--bg); border-radius: 10px; padding: 8px 10px; }
+.product .product-actions a.btn { text-decoration: none; }
