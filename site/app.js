@@ -48,6 +48,50 @@
   document.title = SHOP.name;
   if (SHOP.hours) $("#hours-text").textContent = SHOP.hours;
 
+  // ── 안내자(캐릭터) ─────────────────────────────────
+  const GUIDES = SHOP.guides || [];
+  let guide = null;
+  $("#guide-list").innerHTML = GUIDES.map((g) => `
+    <article class="guide" data-guide="${esc(g.id)}">
+      <div class="guide-art">
+        ${g.image ? `<img src="${esc(g.image)}" alt="${esc(g.name)}" loading="lazy">` : `<div class="guide-ph" aria-hidden="true"><span class="ph-ring"></span><span class="ph-hanja">${esc(g.hanja)}</span><span class="ph-brand">月緣</span></div>`}
+        <div class="guide-info">
+          <h3>${esc(g.name)}</h3>
+          <p>${esc(g.line)}</p>
+          <button type="button" class="btn btn-gold small-btn" data-pick="${esc(g.id)}">${esc(g.name)}${josa(g.name, "과", "와")} 사주 보기</button>
+        </div>
+      </div>
+    </article>`).join("");
+  function pickGuide(id) {
+    guide = GUIDES.find((g) => g.id === id) || null;
+    document.querySelectorAll(".guide").forEach((el) => el.classList.toggle("picked", guide && el.dataset.guide === guide.id));
+    if (guide) {
+      $("#avatar").textContent = guide.hanja;
+      $("#submit-btn").textContent = `${guide.name}에게 내 사주 보여 주기`;
+    }
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pick]");
+    if (!b) return;
+    pickGuide(b.dataset.pick);
+    track(`guide-${b.dataset.pick}`);
+    $("#free").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // ── 후기 (실제 후기만) ─────────────────────────────
+  const REVIEWS = SHOP.reviews || [];
+  if (REVIEWS.length) {
+    const ANIMAL_HANJA = { 쥐: "子", 소: "丑", 호랑이: "寅", 토끼: "卯", 용: "辰", 뱀: "巳", 말: "午", 양: "未", 원숭이: "申", 닭: "酉", 개: "戌", 돼지: "亥" };
+    $("#story-list").innerHTML = REVIEWS.map((v) => `
+      <article class="story">
+        <header><span class="story-badge">${esc(ANIMAL_HANJA[v.animal] || "月")}</span>
+          <div><b>${esc(v.name)}</b><small>${esc(v.animal ? v.animal + "띠 · " : "")}${esc(v.product || "")}</small></div>
+          <time>${esc(v.date || "")}</time></header>
+        <p>${esc(v.text)}</p>
+      </article>`).join("");
+    $("#stories").hidden = false;
+  }
+
   // ── 무료 사주 ────────────────────────────────────────
   const form = $("#saju-form");
   const f = form.elements;
@@ -119,7 +163,8 @@
     const reading = R.build(r, S);
     const who = name ? `${esc(name)}님` : "당신";
     const dmWord = S.STEMS[r.dayMaster] + S.ELEMENTS[r.dayMasterElement];
-    $("#greet").innerHTML = `${who}의 사주를 펼쳐 봤어요. ${r.input.year}년생 <b>${r.animal}띠</b>(${S.label(r.pillars.year)}년)이고, 나를 나타내는 일간은 <b>${dmWord}</b>${josa(dmWord, "이에요", "예요")}.`;
+    const voice = guide ? `${esc(guide.name)}${josa(guide.name, "이", "가")} ` : "";
+    $("#greet").innerHTML = `${voice}${who}의 사주를 펼쳐 봤어요. ${r.input.year}년생 <b>${r.animal}띠</b>(${S.label(r.pillars.year)}년)이고, 나를 나타내는 일간은 <b>${dmWord}</b>${josa(dmWord, "이에요", "예요")}.`;
 
     const cols = [
       ["시", r.pillars.hour, r.hourName || "시 모름"],
@@ -276,11 +321,11 @@
     const serif = '"Noto Serif KR", serif', sans = '"Noto Sans KR", sans-serif';
 
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#17153a");
-    g.addColorStop(1, "#2a2462");
+    g.addColorStop(0, "#f8f4ea");
+    g.addColorStop(1, "#eee6d2");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#ffffff55";
+    ctx.fillStyle = "#1f4d3a33";
     [[120, 160, 2], [930, 120, 3], [820, 300, 2], [160, 520, 2], [980, 620, 2], [70, 980, 3]].forEach(([x, y, rad]) => {
       ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fill();
     });
@@ -290,15 +335,15 @@
     moon.addColorStop(0, "#fffbea"); moon.addColorStop(1, "#e9c46a");
     ctx.fillStyle = moon;
     ctx.beginPath(); ctx.arc(W / 2, 210, 100, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#17153a";
+    ctx.fillStyle = "#173a2c";
     ctx.textAlign = "center";
     ctx.font = `900 64px ${serif}`;
     ctx.fillText("월연", W / 2, 232);
 
-    ctx.fillStyle = "#c9c5e6";
+    ctx.fillStyle = "#5d6b63";
     ctx.font = `500 34px ${sans}`;
     ctx.fillText(`${last.name ? last.name + "님" : "나"}의 사주 · ${r.animal}띠`, W / 2, 380);
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#173a2c";
     ctx.font = `900 50px ${serif}`;
     ctx.fillText(reading.dayMaster.title, W / 2, 452);
 
@@ -308,11 +353,11 @@
     const bw = 190, bh = 150, gap = 22, x0 = (W - (bw * 4 + gap * 3)) / 2, y0 = 530;
     cols.forEach((p, i) => {
       const x = x0 + i * (bw + gap);
-      ctx.fillStyle = "#b6b1d8"; ctx.font = `500 28px ${sans}`;
+      ctx.fillStyle = "#7a857e"; ctx.font = `500 28px ${sans}`;
       ctx.fillText(heads[i] + "주", x + bw / 2, y0 - 16);
       [["stem", 0], ["branch", 1]].forEach(([which, row]) => {
         const y = y0 + row * (bh + 16);
-        let color = "#3a3566", hanja = "?", kor = "모름";
+        let color = "#d9d1bd", hanja = "?", kor = "모름";
         if (p) {
           const e = which === "stem" ? S.STEM_ELEMENT[p.stem] : S.BRANCH_ELEMENT[p.branch];
           color = ELEMENT_COLORS[e];
@@ -320,7 +365,7 @@
           kor = (which === "stem" ? S.STEMS[p.stem] : S.BRANCHES[p.branch]) + " · " + S.ELEMENTS[e];
         }
         ctx.fillStyle = color; rrect(ctx, x, y, bw, bh, 22); ctx.fill();
-        if (i === 1 && row === 0) { ctx.strokeStyle = "#f3d27a"; ctx.lineWidth = 6; rrect(ctx, x - 6, y - 6, bw + 12, bh + 12, 26); ctx.stroke(); }
+        if (i === 1 && row === 0) { ctx.strokeStyle = "#173a2c"; ctx.lineWidth = 6; rrect(ctx, x - 6, y - 6, bw + 12, bh + 12, 26); ctx.stroke(); }
         ctx.fillStyle = "#ffffff";
         ctx.font = `700 80px ${serif}`; ctx.fillText(hanja, x + bw / 2, y + 92);
         ctx.font = `500 26px ${sans}`; ctx.fillText(kor, x + bw / 2, y + 132);
@@ -332,18 +377,18 @@
     const by0 = 900, barX = 250, barW = 640;
     r.counts.forEach((n, i) => {
       const y = by0 + i * 52;
-      ctx.textAlign = "left"; ctx.fillStyle = "#e3e0f5"; ctx.font = `500 30px ${sans}`;
+      ctx.textAlign = "left"; ctx.fillStyle = "#3d4a43"; ctx.font = `500 30px ${sans}`;
       ctx.fillText(`${S.ELEMENTS[i]}(${S.ELEMENTS_HANJA[i]})`, 150, y + 26);
-      ctx.fillStyle = "#ffffff1f"; rrect(ctx, barX, y + 6, barW, 24, 12); ctx.fill();
+      ctx.fillStyle = "#1f4d3a1a"; rrect(ctx, barX, y + 6, barW, 24, 12); ctx.fill();
       if (n) { ctx.fillStyle = ELEMENT_COLORS[i]; rrect(ctx, barX, y + 6, Math.max(24, (barW * n) / total), 24, 12); ctx.fill(); }
-      ctx.textAlign = "right"; ctx.fillStyle = "#ffffff"; ctx.fillText(String(n), 940, y + 28);
+      ctx.textAlign = "right"; ctx.fillStyle = "#173a2c"; ctx.fillText(String(n), 940, y + 28);
     });
 
     // 한 줄 + 주소
     ctx.textAlign = "center";
-    ctx.fillStyle = "#f3d27a"; ctx.font = `700 32px ${sans}`;
+    ctx.fillStyle = "#2e6b52"; ctx.font = `700 32px ${sans}`;
     ctx.fillText(`타고난 강점 · ${reading.dayMaster.good}`, W / 2, 1210);
-    ctx.fillStyle = "#9d98c4"; ctx.font = `500 26px ${sans}`;
+    ctx.fillStyle = "#8a948d"; ctx.font = `500 26px ${sans}`;
     ctx.fillText(`${SHOP.name} · ${siteUrl().replace(/^https?:\/\//, "")}`, W / 2, 1290);
     return c;
   }
