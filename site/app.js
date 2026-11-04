@@ -162,11 +162,13 @@
     document.querySelectorAll(".month-tabs button").forEach((b) => b.classList.toggle("on", Number(b.dataset.offset) === offset));
     $("#tab-this").textContent = `${now.getMonth() + 1}월 · 이번 달`;
     $("#tab-next").textContent = `${((now.getMonth() + 1) % 12) + 1}월 · 다음 달`;
-    $("#m-eyebrow").textContent = `${y}년 ${mo}월 사주`;
+    $("#m-eyebrow").textContent = `${y}`;
+    $("#m-gz").textContent = `${m.pillarLabel}월 · ${m.pillarHanja}`;
+    $("#m-num").textContent = mo;
     $("#m-title").textContent = m.title;
     $("#m-theme").textContent = m.theme;
-    $("#m-meta").innerHTML = `${mo}월의 기운 <b>${esc(m.pillarLabel)}(${esc(m.pillarHanja)})</b> · 내 일간 <b>${esc(m.dmLabel)}</b>`;
-    $("#m-keyword").textContent = `이달의 키워드 · ${m.keyword}`;
+    $("#m-meta").innerHTML = `${mo}월의 기운 <b>${esc(m.pillarLabel)}</b>이 내 일간 <b>${esc(m.dmLabel)}</b>에게 오는 달`;
+    $("#m-keyword").textContent = m.keyword;
     document.querySelectorAll(".m-mon").forEach((el) => (el.textContent = `${mo}월`));
     $("#m-you").textContent = m.you;
     $("#m-overall").textContent = m.overall;
@@ -176,10 +178,10 @@
     $("#m-health").textContent = m.health;
     $("#m-color").textContent = m.luck.color;
     $("#m-dir").textContent = m.luck.dir;
-    $("#m-num").textContent = m.luck.num;
+    $("#m-num-luck").textContent = m.luck.num;
     $("#m-item").textContent = m.luck.item;
     $("#m-cautions").innerHTML = m.cautions.map((c) => `<li>${esc(c)}</li>`).join("");
-    $("#m-quote").textContent = `“${m.quote}”`;
+    $("#m-quote").textContent = m.quote;
     $("#m-note").textContent = `사주의 달은 절기로 바뀌어요. ${mo}월의 기운은 ${mo}월 초 절기(4~8일 무렵)부터 시작돼요.`;
   }
   document.querySelectorAll(".month-tabs button").forEach((b) =>
@@ -300,6 +302,9 @@
     tf.ty.innerHTML = o("", "년", true) + Array.from({ length: yNow - 1901 + 1 }, (_, i) => yNow - i).map((y) => o(y, `${y}년`)).join("");
     tf.tm.innerHTML = o("", "월", true) + Array.from({ length: 12 }, (_, i) => o(i + 1, `${i + 1}월`)).join("");
     tf.td.innerHTML = o("", "일", true) + Array.from({ length: 31 }, (_, i) => o(i + 1, `${i + 1}일`)).join("");
+    tf.ey.innerHTML = o("", "년", true) + Array.from({ length: yNow - 1901 + 1 }, (_, i) => yNow - i).map((y) => o(y, `${y}년`)).join("");
+    tf.em.innerHTML = o("", "월", true) + Array.from({ length: 12 }, (_, i) => o(i + 1, `${i + 1}월`)).join("");
+    tf.ed.innerHTML = o("", "일", true) + Array.from({ length: 31 }, (_, i) => o(i + 1, `${i + 1}일`)).join("");
   })();
 
   function openSheet(id, push = true) {
@@ -311,21 +316,27 @@
     $("#sh-title").textContent = p.name;
     $("#sh-sub").textContent = p.subtitle || "";
     const n = (p.chapters || []).length;
-    $("#sh-chips").innerHTML = [n ? `📖 ${n}장 풀이` : "", "💬 카톡으로 받기", "🗂️ 평생 소장"].filter(Boolean).map((c) => `<span>${c}</span>`).join("");
-    $("#sh-price").innerHTML = `${won(p.price)} <small>${n ? `${n}장 리포트` : ""}</small>`;
+    const HANJA_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五"];
+    $("#sh-chips").innerHTML = [n ? `${HANJA_NUM[n - 1]} · ${n}장의 편지` : "", "카톡으로 도착", "평생 간직"].filter(Boolean).map((c) => `<span>${c}</span>`).join("");
+    $("#sh-price").innerHTML = `<small>편지 값</small><b>${p.price.toLocaleString("ko-KR")}</b><small>원</small>`;
     $("#sh-delivery").textContent = SHOP.delivery || "";
-    $("#sh-toc-title").textContent = `${p.name}${n ? ` · ${n}장` : ""}`;
-    $("#sh-toc").innerHTML = (p.chapters || []).map(([t, d], i) => `<li><span class="n">${i + 1}</span><div><b>${esc(t)}</b><small>${esc(d)}</small></div></li>`).join("");
+    $("#sh-toc-title").textContent = n ? `편지에 담기는 ${n}장` : "편지에 담기는 것";
+    $("#sh-toc").innerHTML = (p.chapters || []).map(([t, d], i) => `<li><span class="n">${HANJA_NUM[i] || i + 1}</span><div class="tl"><b>${esc(t)}</b><i aria-hidden="true"></i></div><small>${esc(d)}</small></li>`).join("");
     const sm = p.sample || {};
     $("#sh-sample-tag").textContent = sm.chapter || p.name;
     $("#sh-sample-text").textContent = sm.text || p.desc;
     $("#sh-sample-hidden").textContent = sm.hidden || "";
-    $("#sh-rec").innerHTML = (p.recommend || []).map((r) => `<li>${r}</li>`).join("");
-    $("#sh-teaser-box").hidden = p.teaser !== "destiny";
+    $("#sh-rec").innerHTML = (p.recommend || []).map((r) => `<li><span>“</span>${r}</li>`).join("");
+    $("#sh-teaser-box").hidden = !p.teaser;
+    $("#tz-ex").hidden = p.teaser !== "reunion";
+    $("#tz-intro").textContent = p.teaser === "reunion"
+      ? "내 생일로 다시 닿기 쉬운 달을, 그 사람 생일까지 넣으면 두 사람의 결을 바로 보여 드려요 · 무료 · 저장 안 함"
+      : "생일만 넣으면 배우자 자리와 인연이 오는 해를 바로 보여 드려요 · 무료 · 저장 안 함";
+    $("#tz-intro").textContent = $("#tz-intro").textContent.replace(" · 무료 · 저장 안 함", "") + " (무료 · 저장하지 않아요)";
     $("#sh-teaser-result").hidden = true;
     $("#sh-buy-name").textContent = p.name;
     $("#sh-buy-price").textContent = won(p.price);
-    if (last && last.result && p.teaser === "destiny") {
+    if (last && last.result && p.teaser) {
       tf.ty.value = last.result.input.year; tf.tm.value = last.result.input.month; tf.td.value = last.result.input.day;
       tf.tg.value = last.gender;
     }
@@ -382,6 +393,7 @@
     $("#sh-teaser-error").textContent = "";
     if (!tf.ty.value || !tf.tm.value || !tf.td.value) { $("#sh-teaser-error").textContent = "생년월일을 모두 골라 주세요."; return; }
     let solar = { year: Number(tf.ty.value), month: Number(tf.tm.value), day: Number(tf.td.value) };
+    if (sheetProduct && sheetProduct.teaser === "reunion") { reunionTeaser(solar); return; }
     let r, d;
     try {
       if (tf.tcal.value === "lunar") solar = window.Lunar.lunarToSolar(solar.year, solar.month, solar.day, false);
@@ -389,19 +401,54 @@
       d = window.Destiny.build(r, S, tf.tg.value, new Date().getFullYear());
     } catch (err) { $("#sh-teaser-error").textContent = err.message; return; }
     const yearsHtml = d.years.length
-      ? d.years.map((y) => `<li><b>${y.year}년 ${esc(y.label)}</b> <small>${esc(y.reasons.join(" · "))}</small></li>`).join("")
-      : `<li>앞으로 5년 안에 뚜렷한 해는 없지만, 대운까지 보면 달라질 수 있어요. 본 풀이에서 10년 흐름으로 짚어 드려요.</li>`;
+      ? d.years.map((y) => `<li class="moon-card"><span class="mc-top">${y.year}</span><b>${esc(y.label)}년</b><small>${esc(y.reasons.join(" · "))}</small></li>`).join("")
+      : `<li class="moon-card wide"><small>앞으로 5년 안에 뚜렷한 해는 없어요. 대운까지 보면 달라질 수 있어 편지에서 10년 흐름으로 짚어 드려요.</small></li>`;
     $("#sh-teaser-result").innerHTML = `
-      <div class="tz-row"><span>배우자 자리</span><b>${esc(d.palace)}</b></div>
+      <div class="mr-line"><span>배우자 자리</span><b>${esc(d.palace)}</b></div>
       <p>운명의 상대는 <b>${esc(d.mood)}</b> 같은 사람이에요. ${esc(d.look)}. ${esc(d.vibe)}</p>
-      <div class="tz-row"><span>배우자 별</span><b>${esc(d.star)}</b></div>
+      <div class="mr-line"><span>배우자 별</span><b>${esc(d.star)}</b></div>
       <p>${esc(d.starText)}</p>
-      <div class="tz-row"><span>인연이 오는 해</span></div>
-      <ul class="tz-years">${yearsHtml}</ul>
-      <div class="tz-locked">🔒 만나는 곳 · 그 사람의 일과 재물 · 잘 맞는 띠 · 연애 패턴 · 함께 사는 모습은 본 풀이에서 공개돼요</div>`;
+      <p class="mr-cap">인연이 오는 해</p>
+      <ul class="moon-cards">${yearsHtml}</ul>
+      <div class="mr-sealed"><span>封</span>만나는 곳 · 그 사람의 일과 재물 · 잘 맞는 띠 · 연애 패턴 · 함께 사는 모습은 편지 안에 있어요</div>`;
     $("#sh-teaser-result").hidden = false;
     track("teaser-destiny");
   });
+
+  // 재회운세 맛보기
+  function reunionTeaser(solar) {
+    const lunar = tf.tcal.value === "lunar";
+    let me, ex = null, res;
+    try {
+      if (lunar) solar = window.Lunar.lunarToSolar(solar.year, solar.month, solar.day, false);
+      me = S.calculate({ ...solar, timeUnknown: true });
+      if (tf.ey.value && tf.em.value && tf.ed.value) {
+        let es = { year: Number(tf.ey.value), month: Number(tf.em.value), day: Number(tf.ed.value) };
+        if (lunar) es = window.Lunar.lunarToSolar(es.year, es.month, es.day, false);
+        ex = S.calculate({ ...es, timeUnknown: true });
+      } else if (tf.ey.value || tf.em.value || tf.ed.value) {
+        throw new Error("그 사람 생일은 년·월·일을 모두 고르거나, 모두 비워 주세요.");
+      }
+      const now = new Date();
+      res = window.Reunion.build(me, S, tf.tg.value, ex, now.getFullYear(), now.getMonth() + 1);
+    } catch (err) { $("#sh-teaser-error").textContent = err.message; return; }
+    const pairHtml = res.pair
+      ? `<div class="mr-line"><span>두 사람의 결</span><b>${esc(res.pair.stem.title)}</b></div>
+         <p>${esc(res.pair.stem.text)}</p>
+         <div class="mr-line"><span>배우자 자리</span><b>${esc(res.pair.palace.title)}</b></div>
+         <p>${esc(res.pair.palace.text)}</p>`
+      : `<p class="mr-tip">그 사람 생일을 넣으면 두 사람이 어떤 사이였는지도 보여 드려요.</p>`;
+    const monthsHtml = res.months.length
+      ? res.months.map((m) => `<li class="moon-card"><span class="mc-top">${m.year}</span><b>${m.month}월</b><em>${esc(m.label)}월</em><small>${esc(m.reasons.join(" · "))}</small></li>`).join("")
+      : `<li class="moon-card wide"><small>앞으로 12달 안에 두드러진 달은 없어요. 이럴 땐 기다림보다 나를 채우는 시간이 먼저예요. 편지에서 더 긴 흐름으로 짚어 드려요.</small></li>`;
+    $("#sh-teaser-result").innerHTML = `${pairHtml}
+      <p class="mr-cap">다시 닿기 쉬운 달</p>
+      <ul class="moon-cards">${monthsHtml}</ul>
+      <p class="mr-tip">사주는 흐름을 보여 줄 뿐, 결과를 정하지 않아요. 연락은 내 마음이 다치지 않는 선에서 해 주세요.</p>
+      <div class="mr-sealed"><span>封</span>헤어진 이유 · 그 사람의 마음 결 · 연락 방법과 타이밍 · 놓아줄 신호 · 나를 회복하는 법은 편지 안에 있어요</div>`;
+    $("#sh-teaser-result").hidden = false;
+    track(ex ? "teaser-reunion-pair" : "teaser-reunion");
+  }
 
   // ── 주문서 ──────────────────────────────────────────
   const dialog = $("#order");
@@ -429,13 +476,13 @@
       `생년월일: ${f.birth.value}`,
       `태어난 시각: ${f.time.value || "모름"}`,
     ];
-    if (p.id === "love") lines.push(`상대방: ${f.partner.value}`);
+    if (p.id === "love" || p.id === "reunion") lines.push(`${p.id === "reunion" ? "그 사람" : "상대방"}: ${f.partner.value || "모름"}`);
     lines.push(`궁금한 점: ${f.question.value || "-"}`, `연락처: ${f.contact.value}`);
     return lines.join("\n");
   }
 
   function refresh() {
-    $("#partner-wrap").hidden = of.elements.product.value !== "love";
+    $("#partner-wrap").hidden = !["love", "reunion"].includes(of.elements.product.value);
     $("#order-text").textContent = orderText();
     $("#copy-done").textContent = "";
   }
