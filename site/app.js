@@ -300,6 +300,9 @@
     tf.ty.innerHTML = o("", "년", true) + Array.from({ length: yNow - 1901 + 1 }, (_, i) => yNow - i).map((y) => o(y, `${y}년`)).join("");
     tf.tm.innerHTML = o("", "월", true) + Array.from({ length: 12 }, (_, i) => o(i + 1, `${i + 1}월`)).join("");
     tf.td.innerHTML = o("", "일", true) + Array.from({ length: 31 }, (_, i) => o(i + 1, `${i + 1}일`)).join("");
+    tf.ey.innerHTML = o("", "년", true) + Array.from({ length: yNow - 1901 + 1 }, (_, i) => yNow - i).map((y) => o(y, `${y}년`)).join("");
+    tf.em.innerHTML = o("", "월", true) + Array.from({ length: 12 }, (_, i) => o(i + 1, `${i + 1}월`)).join("");
+    tf.ed.innerHTML = o("", "일", true) + Array.from({ length: 31 }, (_, i) => o(i + 1, `${i + 1}일`)).join("");
   })();
 
   function openSheet(id, push = true) {
@@ -321,11 +324,15 @@
     $("#sh-sample-text").textContent = sm.text || p.desc;
     $("#sh-sample-hidden").textContent = sm.hidden || "";
     $("#sh-rec").innerHTML = (p.recommend || []).map((r) => `<li>${r}</li>`).join("");
-    $("#sh-teaser-box").hidden = p.teaser !== "destiny";
+    $("#sh-teaser-box").hidden = !p.teaser;
+    $("#tz-ex").hidden = p.teaser !== "reunion";
+    $("#tz-intro").textContent = p.teaser === "reunion"
+      ? "내 생일로 다시 닿기 쉬운 달을, 그 사람 생일까지 넣으면 두 사람의 결을 바로 보여 드려요 · 무료 · 저장 안 함"
+      : "생일만 넣으면 배우자 자리와 인연이 오는 해를 바로 보여 드려요 · 무료 · 저장 안 함";
     $("#sh-teaser-result").hidden = true;
     $("#sh-buy-name").textContent = p.name;
     $("#sh-buy-price").textContent = won(p.price);
-    if (last && last.result && p.teaser === "destiny") {
+    if (last && last.result && p.teaser) {
       tf.ty.value = last.result.input.year; tf.tm.value = last.result.input.month; tf.td.value = last.result.input.day;
       tf.tg.value = last.gender;
     }
@@ -382,6 +389,7 @@
     $("#sh-teaser-error").textContent = "";
     if (!tf.ty.value || !tf.tm.value || !tf.td.value) { $("#sh-teaser-error").textContent = "생년월일을 모두 골라 주세요."; return; }
     let solar = { year: Number(tf.ty.value), month: Number(tf.tm.value), day: Number(tf.td.value) };
+    if (sheetProduct && sheetProduct.teaser === "reunion") { reunionTeaser(solar); return; }
     let r, d;
     try {
       if (tf.tcal.value === "lunar") solar = window.Lunar.lunarToSolar(solar.year, solar.month, solar.day, false);
@@ -402,6 +410,41 @@
     $("#sh-teaser-result").hidden = false;
     track("teaser-destiny");
   });
+
+  // 재회운세 맛보기
+  function reunionTeaser(solar) {
+    const lunar = tf.tcal.value === "lunar";
+    let me, ex = null, res;
+    try {
+      if (lunar) solar = window.Lunar.lunarToSolar(solar.year, solar.month, solar.day, false);
+      me = S.calculate({ ...solar, timeUnknown: true });
+      if (tf.ey.value && tf.em.value && tf.ed.value) {
+        let es = { year: Number(tf.ey.value), month: Number(tf.em.value), day: Number(tf.ed.value) };
+        if (lunar) es = window.Lunar.lunarToSolar(es.year, es.month, es.day, false);
+        ex = S.calculate({ ...es, timeUnknown: true });
+      } else if (tf.ey.value || tf.em.value || tf.ed.value) {
+        throw new Error("그 사람 생일은 년·월·일을 모두 고르거나, 모두 비워 주세요.");
+      }
+      const now = new Date();
+      res = window.Reunion.build(me, S, tf.tg.value, ex, now.getFullYear(), now.getMonth() + 1);
+    } catch (err) { $("#sh-teaser-error").textContent = err.message; return; }
+    const pairHtml = res.pair
+      ? `<div class="tz-row"><span>두 사람의 결</span><b>${esc(res.pair.stem.title)}</b></div>
+         <p>${esc(res.pair.stem.text)}</p>
+         <div class="tz-row"><span>배우자 자리</span><b>${esc(res.pair.palace.title)}</b></div>
+         <p>${esc(res.pair.palace.text)}</p>`
+      : `<p class="tz-tip">그 사람 생일을 넣으면 두 사람이 어떤 사이였는지도 보여 드려요.</p>`;
+    const monthsHtml = res.months.length
+      ? res.months.map((m) => `<li><b>${m.year}년 ${m.month}월 · ${esc(m.label)}월</b> <small>${esc(m.reasons.join(" · "))}</small></li>`).join("")
+      : `<li>앞으로 12달 안에 두드러진 달은 없어요. 이럴 땐 기다림보다 나를 채우는 시간이 먼저예요. 본 풀이에서 더 긴 흐름으로 짚어 드려요.</li>`;
+    $("#sh-teaser-result").innerHTML = `${pairHtml}
+      <div class="tz-row"><span>다시 닿기 쉬운 달</span></div>
+      <ul class="tz-years">${monthsHtml}</ul>
+      <p class="tz-tip">사주는 흐름을 보여 줄 뿐, 결과를 정하지 않아요. 연락은 내 마음이 다치지 않는 선에서 해 주세요.</p>
+      <div class="tz-locked">🔒 헤어진 이유 · 그 사람의 마음 결 · 연락 방법과 타이밍 · 놓아줄 신호 · 나를 회복하는 법은 본 풀이에서 공개돼요</div>`;
+    $("#sh-teaser-result").hidden = false;
+    track(ex ? "teaser-reunion-pair" : "teaser-reunion");
+  }
 
   // ── 주문서 ──────────────────────────────────────────
   const dialog = $("#order");
@@ -429,13 +472,13 @@
       `생년월일: ${f.birth.value}`,
       `태어난 시각: ${f.time.value || "모름"}`,
     ];
-    if (p.id === "love") lines.push(`상대방: ${f.partner.value}`);
+    if (p.id === "love" || p.id === "reunion") lines.push(`${p.id === "reunion" ? "그 사람" : "상대방"}: ${f.partner.value || "모름"}`);
     lines.push(`궁금한 점: ${f.question.value || "-"}`, `연락처: ${f.contact.value}`);
     return lines.join("\n");
   }
 
   function refresh() {
-    $("#partner-wrap").hidden = of.elements.product.value !== "love";
+    $("#partner-wrap").hidden = !["love", "reunion"].includes(of.elements.product.value);
     $("#order-text").textContent = orderText();
     $("#copy-done").textContent = "";
   }

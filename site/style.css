@@ -408,3 +408,7 @@ body.locked-scroll { overflow: hidden; }
 .partner-sub { margin: 2px 0 6px; color: var(--green-2); font-weight: 700; }
 .partner-note { font-size: .82rem; color: var(--ink-soft); background: var(--bg); border-radius: 10px; padding: 8px 10px; }
 .product .product-actions a.btn { text-decoration: none; }
+.tz-ex { margin-top: 12px; }
+.tz-ex .sh-note { margin: 0 0 8px; }
+.tz-ex small { color: #8f87b5; }
+.tz-tip { font-size: .85rem; color: #cfc7e8; background: #ffffff0d; border-radius: 12px; padding: 10px 12px; }
