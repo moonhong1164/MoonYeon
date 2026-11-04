@@ -314,21 +314,23 @@
     $("#sh-title").textContent = p.name;
     $("#sh-sub").textContent = p.subtitle || "";
     const n = (p.chapters || []).length;
-    $("#sh-chips").innerHTML = [n ? `📖 ${n}장 풀이` : "", "💬 카톡으로 받기", "🗂️ 평생 소장"].filter(Boolean).map((c) => `<span>${c}</span>`).join("");
-    $("#sh-price").innerHTML = `${won(p.price)} <small>${n ? `${n}장 리포트` : ""}</small>`;
+    const HANJA_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五"];
+    $("#sh-chips").innerHTML = [n ? `${HANJA_NUM[n - 1]} · ${n}장의 편지` : "", "카톡으로 도착", "평생 간직"].filter(Boolean).map((c) => `<span>${c}</span>`).join("");
+    $("#sh-price").innerHTML = `<small>편지 값</small><b>${p.price.toLocaleString("ko-KR")}</b><small>원</small>`;
     $("#sh-delivery").textContent = SHOP.delivery || "";
-    $("#sh-toc-title").textContent = `${p.name}${n ? ` · ${n}장` : ""}`;
-    $("#sh-toc").innerHTML = (p.chapters || []).map(([t, d], i) => `<li><span class="n">${i + 1}</span><div><b>${esc(t)}</b><small>${esc(d)}</small></div></li>`).join("");
+    $("#sh-toc-title").textContent = n ? `편지에 담기는 ${n}장` : "편지에 담기는 것";
+    $("#sh-toc").innerHTML = (p.chapters || []).map(([t, d], i) => `<li><span class="n">${HANJA_NUM[i] || i + 1}</span><div class="tl"><b>${esc(t)}</b><i aria-hidden="true"></i></div><small>${esc(d)}</small></li>`).join("");
     const sm = p.sample || {};
     $("#sh-sample-tag").textContent = sm.chapter || p.name;
     $("#sh-sample-text").textContent = sm.text || p.desc;
     $("#sh-sample-hidden").textContent = sm.hidden || "";
-    $("#sh-rec").innerHTML = (p.recommend || []).map((r) => `<li>${r}</li>`).join("");
+    $("#sh-rec").innerHTML = (p.recommend || []).map((r) => `<li><span>“</span>${r}</li>`).join("");
     $("#sh-teaser-box").hidden = !p.teaser;
     $("#tz-ex").hidden = p.teaser !== "reunion";
     $("#tz-intro").textContent = p.teaser === "reunion"
       ? "내 생일로 다시 닿기 쉬운 달을, 그 사람 생일까지 넣으면 두 사람의 결을 바로 보여 드려요 · 무료 · 저장 안 함"
       : "생일만 넣으면 배우자 자리와 인연이 오는 해를 바로 보여 드려요 · 무료 · 저장 안 함";
+    $("#tz-intro").textContent = $("#tz-intro").textContent.replace(" · 무료 · 저장 안 함", "") + " (무료 · 저장하지 않아요)";
     $("#sh-teaser-result").hidden = true;
     $("#sh-buy-name").textContent = p.name;
     $("#sh-buy-price").textContent = won(p.price);
@@ -397,16 +399,16 @@
       d = window.Destiny.build(r, S, tf.tg.value, new Date().getFullYear());
     } catch (err) { $("#sh-teaser-error").textContent = err.message; return; }
     const yearsHtml = d.years.length
-      ? d.years.map((y) => `<li><b>${y.year}년 ${esc(y.label)}</b> <small>${esc(y.reasons.join(" · "))}</small></li>`).join("")
-      : `<li>앞으로 5년 안에 뚜렷한 해는 없지만, 대운까지 보면 달라질 수 있어요. 본 풀이에서 10년 흐름으로 짚어 드려요.</li>`;
+      ? d.years.map((y) => `<li class="moon-card"><span class="mc-top">${y.year}</span><b>${esc(y.label)}년</b><small>${esc(y.reasons.join(" · "))}</small></li>`).join("")
+      : `<li class="moon-card wide"><small>앞으로 5년 안에 뚜렷한 해는 없어요. 대운까지 보면 달라질 수 있어 편지에서 10년 흐름으로 짚어 드려요.</small></li>`;
     $("#sh-teaser-result").innerHTML = `
-      <div class="tz-row"><span>배우자 자리</span><b>${esc(d.palace)}</b></div>
+      <div class="mr-line"><span>배우자 자리</span><b>${esc(d.palace)}</b></div>
       <p>운명의 상대는 <b>${esc(d.mood)}</b> 같은 사람이에요. ${esc(d.look)}. ${esc(d.vibe)}</p>
-      <div class="tz-row"><span>배우자 별</span><b>${esc(d.star)}</b></div>
+      <div class="mr-line"><span>배우자 별</span><b>${esc(d.star)}</b></div>
       <p>${esc(d.starText)}</p>
-      <div class="tz-row"><span>인연이 오는 해</span></div>
-      <ul class="tz-years">${yearsHtml}</ul>
-      <div class="tz-locked">🔒 만나는 곳 · 그 사람의 일과 재물 · 잘 맞는 띠 · 연애 패턴 · 함께 사는 모습은 본 풀이에서 공개돼요</div>`;
+      <p class="mr-cap">인연이 오는 해</p>
+      <ul class="moon-cards">${yearsHtml}</ul>
+      <div class="mr-sealed"><span>封</span>만나는 곳 · 그 사람의 일과 재물 · 잘 맞는 띠 · 연애 패턴 · 함께 사는 모습은 편지 안에 있어요</div>`;
     $("#sh-teaser-result").hidden = false;
     track("teaser-destiny");
   });
@@ -429,19 +431,19 @@
       res = window.Reunion.build(me, S, tf.tg.value, ex, now.getFullYear(), now.getMonth() + 1);
     } catch (err) { $("#sh-teaser-error").textContent = err.message; return; }
     const pairHtml = res.pair
-      ? `<div class="tz-row"><span>두 사람의 결</span><b>${esc(res.pair.stem.title)}</b></div>
+      ? `<div class="mr-line"><span>두 사람의 결</span><b>${esc(res.pair.stem.title)}</b></div>
          <p>${esc(res.pair.stem.text)}</p>
-         <div class="tz-row"><span>배우자 자리</span><b>${esc(res.pair.palace.title)}</b></div>
+         <div class="mr-line"><span>배우자 자리</span><b>${esc(res.pair.palace.title)}</b></div>
          <p>${esc(res.pair.palace.text)}</p>`
-      : `<p class="tz-tip">그 사람 생일을 넣으면 두 사람이 어떤 사이였는지도 보여 드려요.</p>`;
+      : `<p class="mr-tip">그 사람 생일을 넣으면 두 사람이 어떤 사이였는지도 보여 드려요.</p>`;
     const monthsHtml = res.months.length
-      ? res.months.map((m) => `<li><b>${m.year}년 ${m.month}월 · ${esc(m.label)}월</b> <small>${esc(m.reasons.join(" · "))}</small></li>`).join("")
-      : `<li>앞으로 12달 안에 두드러진 달은 없어요. 이럴 땐 기다림보다 나를 채우는 시간이 먼저예요. 본 풀이에서 더 긴 흐름으로 짚어 드려요.</li>`;
+      ? res.months.map((m) => `<li class="moon-card"><span class="mc-top">${m.year}</span><b>${m.month}월</b><em>${esc(m.label)}월</em><small>${esc(m.reasons.join(" · "))}</small></li>`).join("")
+      : `<li class="moon-card wide"><small>앞으로 12달 안에 두드러진 달은 없어요. 이럴 땐 기다림보다 나를 채우는 시간이 먼저예요. 편지에서 더 긴 흐름으로 짚어 드려요.</small></li>`;
     $("#sh-teaser-result").innerHTML = `${pairHtml}
-      <div class="tz-row"><span>다시 닿기 쉬운 달</span></div>
-      <ul class="tz-years">${monthsHtml}</ul>
-      <p class="tz-tip">사주는 흐름을 보여 줄 뿐, 결과를 정하지 않아요. 연락은 내 마음이 다치지 않는 선에서 해 주세요.</p>
-      <div class="tz-locked">🔒 헤어진 이유 · 그 사람의 마음 결 · 연락 방법과 타이밍 · 놓아줄 신호 · 나를 회복하는 법은 본 풀이에서 공개돼요</div>`;
+      <p class="mr-cap">다시 닿기 쉬운 달</p>
+      <ul class="moon-cards">${monthsHtml}</ul>
+      <p class="mr-tip">사주는 흐름을 보여 줄 뿐, 결과를 정하지 않아요. 연락은 내 마음이 다치지 않는 선에서 해 주세요.</p>
+      <div class="mr-sealed"><span>封</span>헤어진 이유 · 그 사람의 마음 결 · 연락 방법과 타이밍 · 놓아줄 신호 · 나를 회복하는 법은 편지 안에 있어요</div>`;
     $("#sh-teaser-result").hidden = false;
     track(ex ? "teaser-reunion-pair" : "teaser-reunion");
   }
