@@ -151,6 +151,44 @@
     track(isLunar() ? "free-saju-lunar" : "free-saju");
   });
 
+  // ── 이달의 운세 ─────────────────────────────────────
+  let monthState = null;
+  function renderMonth(offset) {
+    if (!monthState || !window.Monthly) return;
+    const now = new Date();
+    const base = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+    const y = base.getFullYear(), mo = base.getMonth() + 1;
+    const m = window.Monthly.build(monthState.r, S, y, mo, monthState.name);
+    document.querySelectorAll(".month-tabs button").forEach((b) => b.classList.toggle("on", Number(b.dataset.offset) === offset));
+    $("#tab-this").textContent = `${now.getMonth() + 1}월 · 이번 달`;
+    $("#tab-next").textContent = `${((now.getMonth() + 1) % 12) + 1}월 · 다음 달`;
+    $("#m-eyebrow").textContent = `${y}년 ${mo}월 사주`;
+    $("#m-title").textContent = m.title;
+    $("#m-theme").textContent = m.theme;
+    $("#m-meta").innerHTML = `${mo}월의 기운 <b>${esc(m.pillarLabel)}(${esc(m.pillarHanja)})</b> · 내 일간 <b>${esc(m.dmLabel)}</b>`;
+    $("#m-keyword").textContent = `이달의 키워드 · ${m.keyword}`;
+    document.querySelectorAll(".m-mon").forEach((el) => (el.textContent = `${mo}월`));
+    $("#m-you").textContent = m.you;
+    $("#m-overall").textContent = m.overall;
+    $("#m-money").textContent = m.money;
+    $("#m-love").textContent = m.love;
+    $("#m-work").textContent = m.work;
+    $("#m-health").textContent = m.health;
+    $("#m-color").textContent = m.luck.color;
+    $("#m-dir").textContent = m.luck.dir;
+    $("#m-num").textContent = m.luck.num;
+    $("#m-item").textContent = m.luck.item;
+    $("#m-cautions").innerHTML = m.cautions.map((c) => `<li>${esc(c)}</li>`).join("");
+    $("#m-quote").textContent = `“${m.quote}”`;
+    $("#m-note").textContent = `사주의 달은 절기로 바뀌어요. ${mo}월의 기운은 ${mo}월 초 절기(4~8일 무렵)부터 시작돼요.`;
+  }
+  document.querySelectorAll(".month-tabs button").forEach((b) =>
+    b.addEventListener("click", () => {
+      renderMonth(Number(b.dataset.offset));
+      track(Number(b.dataset.offset) ? "month-next" : "month-this");
+    })
+  );
+
   function glyph(p, which) {
     if (!p) return `<div class="glyph unknown"><span class="h">？</span><span class="k">모름</span></div>`;
     const e = which === "stem" ? S.STEM_ELEMENT[p.stem] : S.BRANCH_ELEMENT[p.branch];
@@ -209,6 +247,9 @@
 
     $("#year-title").textContent = `${reading.year.label} 기운`;
     $("#year-text").textContent = reading.year.text;
+
+    monthState = { r, name };
+    renderMonth(0);
 
     $("#result").hidden = false;
     $("#result").scrollIntoView({ behavior: "smooth", block: "start" });

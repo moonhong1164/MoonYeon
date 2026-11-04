@@ -135,6 +135,44 @@
             <p id="greet"></p>
           </div>
 
+          <!-- 이달의 운세 -->
+          <div class="month" id="month">
+            <div class="month-tabs" role="tablist">
+              <button type="button" role="tab" class="on" data-offset="0" id="tab-this">이번 달</button>
+              <button type="button" role="tab" data-offset="1" id="tab-next">다음 달</button>
+            </div>
+            <div class="month-head">
+              <svg class="month-orbit" viewBox="0 0 200 200" aria-hidden="true">
+                <circle cx="100" cy="100" r="88" /><circle cx="100" cy="100" r="62" /><circle cx="100" cy="100" r="36" />
+                <path d="M100 6v188M6 100h188M34 34l132 132M166 34 34 166" />
+                <circle class="sun" cx="100" cy="100" r="9" />
+                <circle class="dot" cx="100" cy="12" r="4" /><circle class="dot" cx="162" cy="100" r="3" /><circle class="dot" cx="58" cy="148" r="3.5" /><circle class="dot" cx="100" cy="64" r="2.5" />
+              </svg>
+              <p class="month-eyebrow" id="m-eyebrow"></p>
+              <h3 class="month-title"><span id="m-title"></span><br><em>— <span id="m-theme"></span> —</em></h3>
+              <p class="month-meta" id="m-meta"></p>
+              <span class="month-chip" id="m-keyword"></span>
+            </div>
+            <div class="m-card m-you"><h4>☀️ 일간으로 보는 <span class="m-mon"></span>의 당신</h4><p id="m-you"></p></div>
+            <div class="m-card m-overall"><h4>🌕 총운</h4><p id="m-overall"></p></div>
+            <div class="m-card m-money"><h4>💰 재물운</h4><p id="m-money"></p></div>
+            <div class="m-card m-love"><h4>💞 애정운</h4><p id="m-love"></p></div>
+            <div class="m-card m-work"><h4>📈 직업·학업운</h4><p id="m-work"></p></div>
+            <div class="m-card m-health"><h4>🌿 건강운</h4><p id="m-health"></p></div>
+            <div class="m-card">
+              <h4><span class="m-mon"></span>의 행운</h4>
+              <div class="luck">
+                <div><small>행운 색</small><b id="m-color"></b></div>
+                <div><small>행운 방향</small><b id="m-dir"></b></div>
+                <div><small>행운 숫자</small><b id="m-num"></b></div>
+                <div><small>행운 아이템</small><b id="m-item"></b></div>
+              </div>
+            </div>
+            <div class="m-card m-caution"><h4><span class="m-mon"></span>에 조심할 것</h4><ul id="m-cautions"></ul></div>
+            <div class="m-card m-quote"><small><span class="m-mon"></span>의 한마디</small><p id="m-quote"></p></div>
+            <p class="hint" id="m-note"></p>
+          </div>
+
           <div class="card">
             <h3 class="card-title">사주 원국표 <small id="calendar-note"></small></h3>
             <div class="pillars" id="pillars"></div>
@@ -178,10 +216,15 @@
             <p class="small" id="share-done" role="status"></p>
           </div>
 
-          <div class="card upsell">
-            <p class="eyebrow">여기까지는 맛보기예요</p>
-            <p>10년 대운 흐름, 재물·연애·건강, 궁금한 질문까지 <b>길고 자세하게</b> 써서 보내 드려요.</p>
-            <a href="#products" class="btn btn-main">자세한 풀이 보러 가기</a>
+          <div class="locked">
+            <div class="locked-card" aria-hidden="true">
+              <div class="locked-blur"><span>大運</span><span>格局</span><span>用神</span></div>
+              <div class="locked-face"><span class="lock">🔒</span><b>평생 사주</b><small>주문하면 전체 공개</small></div>
+            </div>
+            <h3>평생의 흐름도 궁금하지 않아요?</h3>
+            <p><span class="m-mon"></span>만 봤을 뿐인데 이 정도라면…<br>타고난 평생 사주는 어떨까요?<br>월연이 <b>10년 대운·재물·연애·가족</b>까지 약 1만 자로 풀어 드려요.</p>
+            <button type="button" class="btn btn-gold" data-order="life">평생 사주 받아 보기</button>
+            <a class="small more" href="#products">다른 풀이도 보기</a>
           </div>
         </div>
       </div>
@@ -296,6 +339,7 @@
   <script src="saju.js"></script>
   <script src="lunar.js"></script>
   <script src="reading.js"></script>
+  <script src="monthly.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

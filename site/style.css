@@ -273,3 +273,55 @@ dialog::backdrop { background: #0f241bcc; }
   .card { padding: 18px 16px; }
   .pillars { gap: 6px; }
 }
+
+/* 이달의 운세 */
+.month { margin-top: 18px; }
+.month-tabs { display: inline-flex; background: var(--bg-2); border-radius: 999px; padding: 4px; margin-bottom: 12px; }
+.month-tabs button { border: 0; background: none; font: inherit; font-size: .9rem; color: var(--ink-soft); padding: 6px 16px; border-radius: 999px; cursor: pointer; }
+.month-tabs button.on { background: var(--green); color: #fff; font-weight: 700; }
+.month-head { position: relative; overflow: hidden; text-align: center; border-radius: 22px; padding: 28px 20px 26px; color: #f5efe0;
+  background: radial-gradient(circle at 50% 22%, #2e6b5288 0, transparent 55%), linear-gradient(180deg, #173a2c, #0f241b); border: 1px solid #c9a43a55; }
+.month-orbit { width: 150px; height: 150px; display: block; margin: 0 auto 12px; }
+.month-orbit circle, .month-orbit path { fill: none; stroke: #f2d46b66; stroke-width: 1; }
+.month-orbit .sun { fill: #f2d46b; stroke: none; filter: drop-shadow(0 0 8px #f2d46b); }
+.month-orbit .dot { fill: #f2d46b; stroke: none; opacity: .85; }
+.month-eyebrow { margin: 0; font-size: .82rem; letter-spacing: .35em; font-weight: 700; color: var(--gold); }
+.month-title { font-family: var(--serif); font-weight: 700; font-size: clamp(1.25rem, 4.6vw, 1.7rem); line-height: 1.5; margin: 10px 0 8px; color: #fff; }
+.month-title em { font-style: normal; color: var(--gold); }
+.month-meta { margin: 0 0 14px; color: #c9d6cd; font-size: .92rem; }
+.month-meta b { color: var(--gold); }
+.month-chip { display: inline-block; border: 1px solid #f2d46b88; color: var(--gold); border-radius: 999px; padding: 6px 16px; font-size: .88rem; font-weight: 700; background: #f2d46b14; }
+.m-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; margin-top: 12px; }
+.m-card h4 { margin: 0 0 8px; font-size: 1.05rem; color: var(--green-deep); }
+.m-card p { margin: 0; line-height: 1.85; }
+.m-you { text-align: center; }
+.m-you h4 { color: var(--green-2); font-size: .92rem; }
+.m-overall { border-color: #e6c14f; background: #fffaea; }
+.m-money { border-left: 4px solid #c99a3d; }
+.m-love { border-left: 4px solid #e27b98; }
+.m-work { border-left: 4px solid #36508a; }
+.m-health { border-left: 4px solid #4f9a6a; }
+.luck { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.luck div { background: var(--bg); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; }
+.luck small { color: var(--ink-soft); font-size: .8rem; }
+.luck b { color: var(--green-deep); }
+.m-caution { border-color: #e9b3a8; background: #fff6f3; }
+.m-caution ul { margin: 0; padding-left: 18px; }
+.m-caution li { padding: 2px 0; }
+.m-caution li::marker { color: var(--fire); }
+.m-quote { text-align: center; background: #fffaea; border-color: #e6c14f; }
+.m-quote small { color: var(--gold-ink); opacity: .7; }
+.m-quote p { font-family: var(--serif); font-weight: 700; font-size: 1.15rem; color: var(--green-deep); margin-top: 4px; }
+
+/* 잠긴 평생 사주 */
+.locked { text-align: center; margin-top: 18px; border-radius: 22px; padding: 28px 20px; background: linear-gradient(180deg, #173a2c, #0f241b); color: #e8efe9; border: 1px solid #c9a43a55; }
+.locked-card { position: relative; width: 170px; height: 220px; margin: 0 auto 18px; border-radius: 16px; overflow: hidden; transform: rotate(-3deg); border: 1px solid #f2d46b88; box-shadow: 0 14px 30px #00000055; }
+.locked-blur { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; font-family: var(--serif); font-size: 2.2rem; color: #f2d46b; background: linear-gradient(160deg, #2e6b52, #173a2c); filter: blur(5px); }
+.locked-face { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; background: #0f241b66; }
+.locked-face .lock { font-size: 2.2rem; }
+.locked-face b { color: var(--gold); font-family: var(--serif); font-size: 1.1rem; }
+.locked-face small { color: #c9d6cd; }
+.locked h3 { font-family: var(--serif); font-size: 1.3rem; color: #fff; margin: 0 0 8px; }
+.locked p { color: #c9d6cd; line-height: 1.8; margin: 0 0 18px; }
+.locked p b { color: var(--gold); }
+.locked .more { display: block; margin-top: 12px; color: #c9d6cd; }
