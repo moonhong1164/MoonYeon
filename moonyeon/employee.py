@@ -23,6 +23,10 @@ def load_skill(name: str) -> str:
     return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
+def skills_text(emp: config.Employee) -> str:
+    return "\n\n".join(load_skill(name) for name in [emp.skill, *emp.extra_skills])
+
+
 def system_prompt(emp: config.Employee) -> str:
     biz = config.business()
     rules = "\n".join(f"- {r}" for r in biz["house_rules"])
@@ -34,7 +38,7 @@ def system_prompt(emp: config.Employee) -> str:
 {rules}
 
 [업무 지침서]
-{load_skill(emp.skill)}
+{skills_text(emp)}
 
 결과는 한국어로, {biz['owner_title']}이 휴대폰에서 바로 읽을 수 있게 씁니다."""
 
@@ -72,7 +76,7 @@ def run(employee_id: str, task: str, *, extra_context: str = "", trigger: str = 
     """직원에게 일을 맡긴다. `next`가 있으면 다음 직원(예: 검수관)에게 결과를 넘긴다."""
     emp = config.get_employee(employee_id)
     prompt_parts = [f"[지시]\n{task}"]
-    if emp.id in ("chief", "journal"):
+    if emp.id == "chief":  # 비서실장 = 브리핑 + 업무일지
         recent = store.read_worklog(limit=80)
         pending = store.list_outbox()
         log_lines = "\n".join(

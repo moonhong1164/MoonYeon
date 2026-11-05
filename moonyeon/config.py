@@ -31,6 +31,8 @@ class Employee:
     department: str
     role: str
     skill: str
+    # 직원을 합치면서 지침서가 둘 이상 필요한 경우(예: 고객 담당 = 상담 + 사주 풀이)
+    extra_skills: list[str] = field(default_factory=list)
     effort: str = "medium"
     web: bool = False
     inputs: list[str] = field(default_factory=list)

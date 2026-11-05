@@ -71,7 +71,7 @@ def main(argv: list[str]) -> None:
         name = args[4] if len(args) > 4 else ""
         question = " ".join(args[5:]) or "없음"
         task = f"[{PRODUCTS[product]}] 풀이를 써 줘. 고객: {name or '이름 없음'}. 궁금한 점: {question}"
-        _print_results(employee.run("reader", task, extra_context=saju_chart(birth, time, gender, name)))
+        _print_results(employee.run("customer", task, extra_context=saju_chart(birth, time, gender, name)))
     elif cmd == "due":
         for e, r in scheduler.due_routines(store.now()):
             print(e.id, r.cron, r.task)

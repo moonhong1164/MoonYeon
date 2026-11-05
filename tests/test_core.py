@@ -30,7 +30,8 @@ def test_every_employee_has_skill_and_valid_room():
     rooms = {r["id"] for r in config.team()["rooms"]}
     depts = {d["id"] for d in config.team()["departments"]}
     for e in config.employees().values():
-        assert (config.SKILLS_DIR / f"{e.skill}.md").exists(), e.id
+        for skill in [e.skill, *e.extra_skills]:
+            assert (config.SKILLS_DIR / f"{skill}.md").exists(), (e.id, skill)
         assert e.room in rooms and e.department in depts
         assert e.next is None or e.next in config.employees()
         for r in e.routines:
@@ -40,8 +41,8 @@ def test_every_employee_has_skill_and_valid_room():
 def test_run_chain_outbox_and_stats(monkeypatch):
     calls = []
     monkeypatch.setattr(employee.llm, "ask", lambda system, prompt, **kw: calls.append(prompt) or f"결과 {len(calls)}")
-    results = employee.run("blog-writer", "오늘 글 써 줘")
-    assert [r.employee_id for r in results] == ["blog-writer", "blog-reviewer"]
+    results = employee.run("writer", "오늘 글 써 줘")
+    assert [r.employee_id for r in results] == ["writer", "reviewer"]
     assert "결과 1" in calls[1]  # 검수관이 원고를 받음
     assert results[0].outbox_id is None and results[1].outbox_id  # 검수 통과본만 승인 대기
     item = store.decide_outbox(results[1].outbox_id, approved=True)
