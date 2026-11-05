@@ -508,7 +508,6 @@
   });
 
   // 주문서를 사장님 메일로도 자동 전달 (FormSubmit). 같은 주문서는 한 번만 보낸다.
-  if (SHOP.orderMail) $("#order-privacy").hidden = false;
   let mailedText = "";
   function mailOrder() {
     const f = of.elements;
