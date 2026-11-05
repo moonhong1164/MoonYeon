@@ -142,7 +142,7 @@
     last = {
       name: f.name.value.trim(),
       gender: f.gender.value,
-      birth: lunarText ? `${lunarText} (양력 ${solarStr})` : `${solarStr} (양력)`,
+      birth: solarStr, // 음력으로 넣었어도 양력으로 바꾼 날짜
       time: unknown ? "모름" : f.time.value,
       result: r,
       lunarText,
@@ -473,7 +473,7 @@
       `상품: ${p.name} (${won(p.price)})`,
       `이름: ${f.name.value}`,
       `성별: ${f.gender.value}`,
-      `생년월일: ${f.birth.value}`,
+      `생년월일: ${f.birth.value} (${f.cal.value})`,
       `태어난 시각: ${f.time.value || "모름"}`,
     ];
     if (p.id === "love" || p.id === "reunion") lines.push(`${p.id === "reunion" ? "그 사람" : "상대방"}: ${f.partner.value || "모름"}`);
@@ -496,7 +496,10 @@
     if (last) {
       of.elements.name.value ||= last.name;
       of.elements.gender.value = last.gender;
-      of.elements.birth.value ||= last.birth;
+      if (!of.elements.birth.value) {
+        of.elements.birth.value = last.birth;
+        of.elements.cal.value = "양력";
+      }
       of.elements.time.value ||= last.time;
     }
     refresh();
@@ -504,7 +507,43 @@
     track(`order-open-${btn.dataset.order}`);
   });
 
-  $("#kakao-link").addEventListener("click", () => track("order-kakao"));
+  // 주문서를 사장님 메일로도 자동 전달 (FormSubmit). 같은 주문서는 한 번만 보낸다.
+  let mailedText = "";
+  function mailOrder() {
+    const f = of.elements;
+    if (!SHOP.orderMail || !f.name.value || !f.birth.value || !f.contact.value) return;
+    const text = orderText();
+    if (text === mailedText) return;
+    mailedText = text;
+    const p = SHOP.products.find((x) => x.id === f.product.value);
+    const body = {
+      _subject: `[월연 주문] ${p.name} · ${f.name.value}`,
+      _template: "box",
+      _captcha: "false",
+      상품: `${p.name} (${won(p.price)})`,
+      상품코드: p.id,
+      이름: f.name.value,
+      성별: f.gender.value,
+      생년월일: f.birth.value,
+      양력음력: f.cal.value,
+      태어난시각: f.time.value || "모름",
+      상대방: ["love", "reunion"].includes(p.id) ? f.partner.value || "모름" : "-",
+      궁금한점: f.question.value || "-",
+      연락처: f.contact.value,
+      주문서: text,
+    };
+    fetch(`https://formsubmit.co/ajax/${SHOP.orderMail}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(body),
+      keepalive: true,
+    }).then(() => track("order-mail")).catch(() => { mailedText = ""; });
+  }
+
+  $("#kakao-link").addEventListener("click", () => {
+    track("order-kakao");
+    mailOrder();
+  });
 
   $("#copy-order").addEventListener("click", async () => {
     const f = of.elements;
@@ -512,6 +551,7 @@
       $("#copy-done").textContent = "이름, 생년월일, 연락받을 곳은 꼭 적어 주세요.";
       return;
     }
+    mailOrder();
     try {
       await navigator.clipboard.writeText(orderText());
       $("#copy-done").textContent = "복사했어요! 카카오톡 채팅창에 붙여 넣어 보내 주세요.";

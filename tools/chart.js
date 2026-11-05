@@ -5,9 +5,13 @@
  *   node tools/chart.js --birth 1995-08-20 --time 07:30 --gender 여 --name 김하늘
  *   node tools/chart.js --birth 1995-08-20 --time 모름 --gender 남
  *
- * 생년월일은 양력. (음력이면 한국천문연구원 음양력 변환으로 먼저 바꾼다)
+ *   node tools/chart.js --birth 1994-06-18 --lunar 1 --time 17:30 --gender 여   (음력 생일)
+ *   node tools/chart.js --birth 1993-03-10 --lunar 1 --leap 1 ...               (음력 윤달)
+ *
+ * 생년월일은 기본이 양력. --lunar 1 이면 site/lunar.js로 양력으로 바꿔서 계산한다.
  */
 const S = require("../site/saju.js");
+const Lunar = require("../site/lunar.js");
 
 function args(argv) {
   const out = {};
@@ -15,8 +19,17 @@ function args(argv) {
   return out;
 }
 
-function chart({ birth, time = "모름", gender, name = "", now = new Date() }) {
-  const [year, month, day] = birth.split("-").map(Number);
+const truthy = (v) => v === true || ["1", "true", "yes", "y", "음력"].includes(String(v || "").toLowerCase());
+
+function chart({ birth, time = "모름", gender, name = "", lunar, leap, now = new Date() }) {
+  let [year, month, day] = birth.split("-").map(Number);
+  let lunarNote = "";
+  if (truthy(lunar)) {
+    const sol = Lunar.lunarToSolar(year, month, day, truthy(leap));
+    lunarNote = `음력 ${birth}${truthy(leap) ? "(윤달)" : ""} → `;
+    [year, month, day] = [sol.year, sol.month, sol.day];
+    birth = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
   const unknown = !time || time === "모름";
   const [hour, minute] = unknown ? [12, 0] : time.split(":").map(Number);
   const r = S.calculate({ year, month, day, hour, minute, timeUnknown: unknown, gender });
@@ -28,7 +41,7 @@ function chart({ birth, time = "모름", gender, name = "", now = new Date() }) 
   const lines = [];
   lines.push(`# 사주 자료 — ${name || "(이름 없음)"} (${gender || "성별 모름"})`);
   lines.push("");
-  lines.push(`- 양력 ${birth} ${unknown ? "시 모름" : time} · 서울 기준 시간 보정${r.input.dst ? " · 서머타임 1시간 뺌" : ""}`);
+  lines.push(`- ${lunarNote}양력 ${birth} ${unknown ? "시 모름" : time} · 서울 기준 시간 보정${r.input.dst ? " · 서머타임 1시간 뺌" : ""}`);
   lines.push(`- ${r.animal}띠 (${S.label(r.pillars.year)}년생 기준 입춘 적용) · 월령: ${r.monthTermName} 이후`);
   lines.push(`- 일간(나): **${stemInfo(dm)}** (${dm % 2 === 0 ? "양" : "음"})`);
   if (r.nearTermBoundary) lines.push(`- ⚠️ 절기 경계 1시간 이내 출생 — 월주가 바뀔 수 있음, 풀이에서 언급할 것`);
@@ -121,7 +134,7 @@ function chart({ birth, time = "모름", gender, name = "", now = new Date() }) 
 if (require.main === module) {
   const a = args(process.argv.slice(2));
   if (!a.birth) {
-    console.error("사용법: node tools/chart.js --birth YYYY-MM-DD [--time HH:MM|모름] --gender 남|여 [--name 이름]");
+    console.error("사용법: node tools/chart.js --birth YYYY-MM-DD [--time HH:MM|모름] --gender 남|여 [--name 이름] [--lunar 1] [--leap 1]");
     process.exit(1);
   }
   console.log(chart(a));

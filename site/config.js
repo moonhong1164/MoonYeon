@@ -16,6 +16,9 @@ window.SHOP = {
   // 방문자 분석 (GoatCounter 무료) — https://www.goatcounter.com 가입 후 정한 코드만 넣으세요. 예: "wolyeon"
   // 비워 두면 분석을 쓰지 않아요. 개인정보(생년월일 등)는 보내지 않고, 방문·버튼 클릭 수만 셉니다.
   analytics: "moonyeon",
+  // 주문서 자동 메일 전달(FormSubmit) 주소. 메일 주소를 그대로 넣지 말고, 인증 후 받은 무작위 주소(영문·숫자)를 넣어요.
+  // 비워 두면 메일 전달 없이 카톡으로만 받아요. 설정법: docs/operations/풀이-자동화.md
+  orderMail: "",
 
   // 첫 화면 위 배너 (시즌 상품 홍보). until 날짜가 지나면 자동으로 사라져요. 끄려면 enabled: false
   promo: {
