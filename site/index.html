@@ -384,9 +384,10 @@
         <label>성별<select name="gender"><option>여</option><option>남</option></select></label>
       </div>
       <div class="row">
-        <label>생년월일<input name="birth" required placeholder="1995-08-20 (양력/음력 적어 주세요)"></label>
-        <label>태어난 시각<input name="time" placeholder="07:30 또는 모름"></label>
+        <label>생년월일<input name="birth" required inputmode="numeric" placeholder="1995-08-20"></label>
+        <label>양력·음력<select name="cal"><option>양력</option><option>음력</option><option>음력 윤달</option></select></label>
       </div>
+      <label>태어난 시각<input name="time" placeholder="07:30 또는 모름"></label>
       <label id="partner-wrap" hidden>상대방 이름·생년월일·시각<input name="partner" placeholder="예: 이달님 1994-03-02 양력 14:00"></label>
       <label>궁금한 점<textarea name="question" rows="3" maxlength="500" placeholder="예: 올해 이직해도 될까요?"></textarea></label>
       <label>연락받을 곳<input name="contact" required placeholder="카카오톡 아이디 또는 휴대폰 번호"></label>
@@ -401,6 +402,7 @@
         <a class="btn btn-yellow" id="kakao-link" target="_blank" rel="noopener" hidden>카카오톡으로 보내기</a>
       </div>
       <p class="small" id="copy-done" role="status"></p>
+      <p class="small" id="order-privacy" hidden>주문서는 풀이 준비를 위해 월연 메일함에도 함께 전달돼요. 풀이 외에는 쓰지 않아요.</p>
     </form>
   </dialog>
 

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>월연 주문 메일 연결</title>
+  <style>
+    body { margin: 0; background: #f6f1e4; color: #1f3a2e; font: 16px/1.7 system-ui, sans-serif; }
+    main { max-width: 440px; margin: 40px auto; padding: 0 16px; }
+    input, button { width: 100%; box-sizing: border-box; font: inherit; padding: 12px; border-radius: 10px; margin-top: 8px; }
+    input { border: 1px solid #c9bfa6; background: #fffdf7; }
+    button { border: 0; background: #1f3a2e; color: #f6f1e4; cursor: pointer; }
+    p.small { font-size: 14px; color: #5b6b62; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>주문 메일 연결 (사장님 전용)</h1>
+    <p>주문서가 메일로도 오게 하려면, 처음 한 번만 받을 메일 주소를 FormSubmit에 인증해야 해요.</p>
+    <form id="f">
+      <input id="mail" type="email" required placeholder="주문을 받을 메일 주소">
+      <button>인증 메일 보내기</button>
+    </form>
+    <p id="msg" role="status"></p>
+    <p class="small">메일 주소는 이 화면에서 FormSubmit으로만 보내지고 홈페이지에 저장되지 않아요.
+      받은 메일의 <b>Activate Form</b>을 누른 뒤 안내되는 무작위 주소(영문·숫자)를 <code>site/config.js</code>의 <code>orderMail</code>에 넣으면 끝이에요.</p>
+  </main>
+  <script>
+    document.getElementById("f").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("msg");
+      msg.textContent = "보내는 중…";
+      try {
+        const r = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(document.getElementById("mail").value.trim()), {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ _subject: "[월연 주문] 메일 연결 테스트", 안내: "월연 홈페이지 주문 메일 연결 테스트예요." }),
+        });
+        const j = await r.json().catch(() => ({}));
+        msg.textContent = j.message || "보냈어요. 메일함(스팸함 포함)에서 FormSubmit 인증 메일을 확인해 주세요.";
+      } catch {
+        msg.textContent = "보내지 못했어요. 잠시 뒤 다시 눌러 주세요.";
+      }
+    });
+  </script>
+</body>
+</html>

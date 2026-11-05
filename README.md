@@ -85,6 +85,7 @@ python -m moonyeon bot
 - **제휴 상품**: `site/config.js`의 `partners`에 제휴사 트래킹 링크를 넣으면 상품 목록에 '제휴' 카드로 나와요(가격·결제·환불은 제휴사). 클릭은 GoatCounter `partner-○○`로 세고, 코드 기록은 `docs/marketing/제휴-트래킹-코드.md`.
 - **재회운세**: 내 생일로 '다시 닿기 쉬운 달'(앞으로 12달), 그 사람 생일까지 넣으면 '두 사람의 결'을 무료 맛보기로 보여 줘요(`site/reunion.js`). 확률 숫자·단정은 쓰지 않아요.
 - **유료 풀이**: 재회운세(10장), 운명의 상대(10장), 평생 사주·연애 궁합·재물/직업운·신년운세. 주문서를 작성하면 카카오톡으로 보내고 계좌이체로 결제받습니다.
+  - **자동 풀이**: 주문서는 사장님 메일로도 전달되고(`orderMail`), 입금완료 라벨을 붙이면 예약 작업이 풀이를 써서 드라이브·Gmail 초안으로 남겨요 → `docs/operations/풀이-자동화.md`
 - **시즌 배너**: `site/config.js`의 `promo`에서 문구·상품·종료일(`until`)을 정하면 첫 화면 위 금색 배너로 보여요. 지금은 2027 신년운세(2027-02-28까지).
 - **방문자 분석**: `site/config.js`의 `analytics`에 GoatCounter 코드를 넣으면 방문 수와 무료 사주·주문서 열기·카톡 보내기·공유 클릭 수를 셉니다(개인정보는 보내지 않음).
 - **✏️ 사장님이 고칠 곳은 `site/config.js` 하나**: 가게 이름, 카카오톡 채널 주소, 입금 계좌(현재 비움 — 카톡으로 안내), 상품·가격.
@@ -99,7 +100,7 @@ python -m moonyeon bot
 python -m moonyeon chart 1995-08-20 07:30 여 김하늘
 ```
 
-→ 풀이에 필요한 사주 자료(원국·십신·오행·삼합/충·10년 대운·올해/내년 세운)를 뽑아 줍니다. (`node tools/chart.js`와 같음)
+→ 풀이에 필요한 사주 자료(원국·십신·오행·삼합/충·10년 대운·올해/내년 세운)를 뽑아 줍니다. (`node tools/chart.js`와 같음. 음력 생일은 `--lunar 1`, 윤달은 `--leap 1`)
 
 ```bash
 python -m moonyeon reading life 1995-08-20 07:30 여 김하늘 "올해 이직해도 될까요?"
@@ -119,7 +120,7 @@ python -m pytest -q
 ```
 
 ```bash
-node --test tests/
+node --test tests/*.test.js
 ```
 
 AI 호출은 Claude API(`claude-opus-5-5`, 적응형 사고, 직원별 effort, 웹 검색, 거절 시 서버 측 대체 모델)를 사용합니다.
